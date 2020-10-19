@@ -11,11 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Notes
 
-## Questions
 
-The example in Log likelihood $L(\theta) = f(y_1, \theta)f(y_2, \theta)f(y_T, \theta)$, we are assuming each sample is independent, 
-what if this is not the case? e.g. if $y_t$ is not independent of $y_{t-1}$, e.g. if we take the price of an equity this is not 
-indpendent, but if we take the return this would be independent.
 
 
 ## Lecture 3 Notes
@@ -29,6 +25,14 @@ The ML estimator is normally distributed and is efficient.
 
 
 Log Likelihood: We are assuming independence here in our original notes, hence the joint distribution is the product of their marginal distributions. This is not the case for a time-series but we will look at this later. (Assume a product of their conditional distributions and marginals)
+
+## Questions
+
+
+The example in Log likelihood $L(\theta) = f(y_1, \theta)f(y_2, \theta)f(y_T, \theta)$, we are assuming each sample is independent, 
+what if this is not the case? e.g. if $y_t$ is not independent of $y_{t-1}$, e.g. if we take the price of an equity this is not 
+indpendent, but if we take the return this would be independent.
+
 
 ## Lecture 5 Notes
 
@@ -72,8 +76,4 @@ Use BIC model selection criteria in general.
 
 --- 
 Exams will contain output from a statistical programmes and we will be asked questions on this. 
-
-
-
-
 

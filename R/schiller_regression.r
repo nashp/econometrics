@@ -55,3 +55,5 @@ var_Beta_hat <- sigma2_hat * solve((t(X) %*% X))
 ggplot(data=sh_data) + 
   geom_line(aes(x=LE, y=LD), colour="red") + 
   geom_line(aes(x=LE, y=X%*%beta_hat), colour="blue")
+
+
