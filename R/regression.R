@@ -43,3 +43,6 @@ std_error <- sqrt(diag(var_Beta_hat))
 
 
 #Derman Watson?
+
+
+
