@@ -26,6 +26,16 @@ k <- ncol(X)
 
 u <- y - X%*%beta_hat
 
+# Plot
+
+ggplot() + 
+  geom_point(aes(x = X[,2], y = y), 
+             colour="red") + 
+  geom_point(aes(x = X[,2], 
+                 y = X %*% beta_hat), 
+             colour="blue")
+
+hist(u)
 # Now Var(B) which is = sigma^2 (X' X) ^ -1
 # we estimate sigma^2 by u'u/T-k
 
@@ -43,3 +53,6 @@ std_error <- sqrt(diag(var_Beta_hat))
 
 
 #Derman Watson?
+
+
+
