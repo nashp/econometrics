@@ -1,11 +1,14 @@
 library(readxl)
 library(dplyr)
 library(ggplot2)
+library(roll)
 sh_data <- read_excel("../data/Shiller16.xlsx")
 
 sh_data <- sh_data %>% 
-  dplyr::mutate(lNSP = log(NSP), dlNSP = lNSP - dplyr::lag(lNSP, n=1), 
-                LD = log(ND), LE = log(NE), PO = ND / NE) %>%
+  dplyr::mutate(lNSP = log(NSP), dlNSP = lNSP - dplyr::lag(lNSP, n = 1), 
+                LD = log(ND), LE = log(NE), PO = ND / NE, 
+                LDlag = dplyr::lag(LD, n = 1), LElag = dplyr::lag(LE, n = 1), 
+                MA = roll_mean(LD, width = 3, min_obs = 3)) %>%
   filter(is.finite(NE), is.finite(ND))
 
 
@@ -57,3 +60,5 @@ ggplot(data=sh_data) +
   geom_line(aes(x=LE, y=X%*%beta_hat), colour="blue")
 
 
+reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$MA)
+summary(reg)
