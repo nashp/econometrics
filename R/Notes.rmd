@@ -53,9 +53,14 @@ p-value think about it as the probability the null hypothesis is true
 
 why is individual null hypthoses a t-test and join and f-test?, how is this linked to what we saw ,
 
-Joint and individual tests can conáict
+Joint and individual tests can conflict
 
 trying to link the linear restrictions we impose with what 
+
+
+so our restrictions are our hypotheses. So if $\beta$ is a kx1 vector of parameters then $R\beta = q$ is just like $\beta_0 = u$,  $\beta_1 - v$, $\beta_2 = w$
+
+QL 
 
 ## Live Lecture 19/10/2020 of lecture 4
 
@@ -86,3 +91,41 @@ Use BIC model selection criteria in general.
 --- 
 Exams will contain output from a statistical programmes and we will be asked questions on this. 
 
+
+## Lecture 6 Asymptotic Test Proceedures. 
+
+If we can't get exact results we look at asymptotic approximations, we are more likely to reject using this 
+
+use the F where possible when both F & $\chi^2$ are given as the later is asymptotic and F is exact
+
+$S(\hat\theta)$, the score vector is the derivative of the LL w.r.t each of the k elements (number of co-efficents/parameters) of the vector $\theta$
+
+$\lambda^' R(\theta)$ is a scalar
+
+Q: why are we doing this restriction?
+
+The restrictions are our hypotheses, if they are trye, the two log likelihood should be similar $LL(\theta) - LL(\theta^\star)$, See lecture 5 above
+
+Q: Maybe speak about how the hypotheses and restrictions are alike
+
+- Test Procedures
+$R(\hat\theta)$ has the same structure as $R\hat{\beta} - q$
+  
+*Note: The difference between Legrange multiplier is that the variance covariance matrix in the Wald is evaluated at $\hat\theta$ versus $\theta^{\star}$ 
+
+- Source of non linear restrictions
+
+Q: What is the restricted and non restricted Model?
+
+Is $\rho$ the correlation co-efficient?
+
+Where doe our hypothesis $H_0: R_m(\theta) = \theta_1\theta_2 - \theta_3 =0$ originate from?
+
+-- Bootstrap
+
+Q: THis can be applied to any of the estimators we've used?
+
+
+Bootrap food for small sample estimates
+
+ARDL model is what we look at in week 3 of the practicals. 

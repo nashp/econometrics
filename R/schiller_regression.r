@@ -2,8 +2,11 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(roll)
+library(car)
 sh_data <- read_excel("../data/Shiller16.xlsx")
 
+# Because ND & NE have very notiecable trends we can 
+# take logs to make these more linear or take a ratio in PO (payout ratio)
 sh_data <- sh_data %>% 
   dplyr::mutate(lNSP = log(NSP), dlNSP = lNSP - dplyr::lag(lNSP, n = 1), 
                 LD = log(ND), LE = log(NE), PO = ND / NE, 
@@ -32,12 +35,12 @@ variance = serror * serror
 
 y = as.matrix(sh_data$LD)
 X = as.matrix(sh_data$LE)
-X <- cbind(rep(1, nrow(X)), X)
 
 reg <- lm(y ~ X)
 
 # Beta = (X'X)^-1 X' y
 
+X <- cbind(rep(1, nrow(X)), X)
 beta_hat <- solve(t(X)%*%X) %*% t(X) %*% y
 
 u = y - X %*% beta_hat
@@ -62,3 +65,9 @@ ggplot(data=sh_data) +
 
 reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$MA)
 summary(reg)
+
+y <- sh_data$LD
+X <- matrix(c(sh_data$LDlag, sh_data$LE, sh_data$LElag, sh_data$MA), 
+            nrow=nrow(sh_data),
+            byrow = T)
+X <- cbind(rep(1, nrow(X)), X)
