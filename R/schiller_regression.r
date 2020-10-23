@@ -65,3 +65,9 @@ ggplot(data=sh_data) +
 
 reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$MA)
 summary(reg)
+
+y <- sh_data$LD
+X <- matrix(c(sh_data$LDlag, sh_data$LE, sh_data$LElag, sh_data$MA), 
+            nrow=nrow(sh_data),
+            byrow = T)
+X <- cbind(rep(1, nrow(X)), X)
