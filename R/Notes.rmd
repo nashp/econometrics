@@ -129,3 +129,32 @@ Q: THis can be applied to any of the estimators we've used?
 Bootrap food for small sample estimates
 
 ARDL model is what we look at in week 3 of the practicals. 
+
+
+## Live Lecture 23/10/2020 (lecture 6)
+
+Restrictions  Hypotheses are the same things, 
+
+So tip: Start from a general model and then begin to impose restrictions
+
+e.g Start with normal LRM, but if we observe some autocorrelation then model this
+
+See Source of non linear restrictions 
+
+so see $y_t = \beta x_t -\rho\beta x_{t-1} + \rho y_{t-1}$
+
+we can say $\alpha = \rho$ and $ \beta_1 = \alpha  \beta_0$
+
+equation 3 is our restricted model, 
+equation 2 is our unrestricted, if we impose a restriction we reduce the number of variables
+
+Non-linear estimation
+
+Why is it non linear? We are multiplying $\rho$ and $\beta$, multiplicative affect
+
+--
+in final equation, generalised least squares. 
+
+$y_t - \rho y_{t-1}$ is on the left hand side as we know this $y_t$ and $y_{t-1}$ and we make an initial estimate of \rho
+
+The serial correlation of the errors implies that the previous value of the variable affects the current value
