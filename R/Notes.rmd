@@ -33,7 +33,16 @@ The example in Log likelihood $L(\theta) = f(y_1, \theta)f(y_2, \theta)f(y_T, \t
 what if this is not the case? e.g. if $y_t$ is not independent of $y_{t-1}$, e.g. if we take the price of an equity this is not 
 indpendent, but if we take the return this would be independent.
 
+# Tutorial 2 Covering Log Likelihood
 
+We are choosing the value of theta which maximises our probability density function. Higher joint probability 
+distribution , higher probability, implies more likely
+
+https://www.youtube.com/watch?v=XepXtl9YKwc&vl=en&ab_channel=StatQuestwithJoshStarmer
+
+towardsdatascience.com/maximum-likelihood-estimation-explained-normal-distribution-6207b322e47f
+
+arg max notation, the argument that maximises $arg max_{\theta E \Theta}$
 ## Lecture 5 Notes
 
 Looking at testing and inference. Could this estimate have happened by chance. We will look at distributions of the estimators.
