@@ -11,7 +11,7 @@ sh_data <- sh_data %>%
   dplyr::mutate(lNSP = log(NSP), dlNSP = lNSP - dplyr::lag(lNSP, n = 1), 
                 LD = log(ND), LE = log(NE), PO = ND / NE, 
                 LDlag = dplyr::lag(LD, n = 1), LElag = dplyr::lag(LE, n = 1), 
-                MA = roll_mean(LD, width = 3, min_obs = 3)) %>%
+                trend =  row_number())%>%
   filter(is.finite(NE), is.finite(ND))
 
 
@@ -45,15 +45,14 @@ beta_hat <- solve(t(X)%*%X) %*% t(X) %*% y
 
 u = y - X %*% beta_hat
 
-hist(u)
+static_model_residuals <- u
 
-T <- nrow(y)
-k <- ncol(X)
-var_Beta_hat <- t(u) %*% u / (T - k)
+hist(u)
 
 # Now Var(B) which is = sigma^2 (X' X) ^ -1
 # we estimate sigma^2 by u'u/T-k
-
+T <- nrow(y)
+k <- ncol(X)
 sigma2_hat <- t(u) %*% u /(T-k)
 sigma2_hat <- sigma2_hat[,1] 
 var_Beta_hat <- sigma2_hat * solve((t(X) %*% X))
@@ -62,8 +61,11 @@ ggplot(data=sh_data) +
   geom_line(aes(x=LE, y=LD), colour="red") + 
   geom_line(aes(x=LE, y=X%*%beta_hat), colour="blue")
 
+# multi parameter model
 
-reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$MA)
+# ld = alpha_0 + alpha_1 * ld_t-1 + beta_0 * le_t + beta_1 * le_t-1 + gamma * t + ut
+
+reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$trend)
 summary(reg)
 
 y <- sh_data$LD
@@ -71,3 +73,18 @@ X <- matrix(c(sh_data$LDlag, sh_data$LE, sh_data$LElag, sh_data$MA),
             nrow=nrow(sh_data),
             byrow = T)
 X <- cbind(rep(1, nrow(X)), X)
+
+cleaned_data <- na.omit(cbind(y, X))
+y <- cleaned_data[,1]
+X <- cleaned_data[,2:ncol(cleaned_data)]
+Beta_hat <- solve(t(X) %*% X) %*% t(X) %*% y
+
+# 
+
+u = y - X %*% Beta_hat
+
+T <- nrow(y)
+k <- ncol(X)
+sigma2_hat <- t(u) %*% u /(T-k)
+sigma2_hat <- sigma2_hat[,1] 
+var_Beta_hat <- sigma2_hat * solve((t(X) %*% X))

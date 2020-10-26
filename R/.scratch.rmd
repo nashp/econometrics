@@ -1,0 +1,14 @@
+---
+title: "Notes"
+author: "Peter Nash"
+date: "18/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Notes
+
+$d_t = \alpha_0 + \alpha_1 d_{t-1} + \beta_0 e_t + \beta_1(e_{t-1} + t) + u_t$

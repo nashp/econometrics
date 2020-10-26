@@ -157,4 +157,12 @@ in final equation, generalised least squares.
 
 $y_t - \rho y_{t-1}$ is on the left hand side as we know this $y_t$ and $y_{t-1}$ and we make an initial estimate of \rho
 
+-- 
 The serial correlation of the errors implies that the previous value of the variable affects the current value
+
+
+-- Recommended reading
+
+'A guide to Econometrics' KEnnedy
+Stock and Watson - from Ron
+Verbeek - closest to the course
