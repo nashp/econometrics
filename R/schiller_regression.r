@@ -68,15 +68,14 @@ ggplot(data=sh_data) +
 reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$trend)
 summary(reg)
 
-y <- sh_data$LD
-X <- matrix(c(sh_data$LDlag, sh_data$LE, sh_data$LElag, sh_data$MA), 
-            nrow=nrow(sh_data),
-            byrow = T)
+y <- as.matrix(sh_data$LD)
+X <- matrix(cbind(sh_data$LDlag, sh_data$LE, sh_data$LElag, sh_data$trend),
+            ncol=4, nrow=nrow(sh_data))
 X <- cbind(rep(1, nrow(X)), X)
 
 cleaned_data <- na.omit(cbind(y, X))
-y <- cleaned_data[,1]
-X <- cleaned_data[,2:ncol(cleaned_data)]
+y <- as.matrix(cleaned_data[,1])
+X <- as.matrix(cleaned_data[,2:ncol(cleaned_data)])
 Beta_hat <- solve(t(X) %*% X) %*% t(X) %*% y
 
 # 
