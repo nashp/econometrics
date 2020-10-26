@@ -166,3 +166,32 @@ The serial correlation of the errors implies that the previous value of the vari
 'A guide to Econometrics' KEnnedy
 Stock and Watson - from Ron
 Verbeek - closest to the course
+
+
+## Lecture 7 26/10/2020
+
+We are looking at what happens when models fail or our assumptions fail
+
+LRM is designed to handle correlation between variables. It will lead to a higher standard error. 
+
+Multicollinearity or issues arising from it are not something to worry unduly about. They are not one of our main assumptions
+
+
+Always plot at and look at the residuals, YOU WILL BE PENALISED in your project if you don't look at outliers, structural breaks etc. 
+
+
+Q: In Gauss LRM: How have you come by the variance of $\hat \beta$ in first term
+
+Q: Could you explain more about respecifying the model? & Dummy variable trap
+
+Q: Can we test exogeneity simply by looking at the correlation ofX & u?
+
+Q: With $\Omega$ we get 0 off diagonals because, $E[u_t u_{t-i}] = 0$ #  (serial correlation or autocorrelation)
+
+Q: In GLS we see the distribution contains $\Omega$, to the following results are just the result of maximising the Log-Likelihood? Log of distribution, take the first and second derivatives w.r.t the paramaters 
+
+
+
+
+
+
