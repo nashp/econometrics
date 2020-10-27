@@ -94,3 +94,4 @@ Xr <- cbind(X[,1:3], X[,4] - X[, 5])
 
 beta_hat_restricted <- solve(t(Xr) %*% Xr) %*% t(Xr) %*% y
 
+u_restricted <- Xr %*% beta_hat_restricted - y
