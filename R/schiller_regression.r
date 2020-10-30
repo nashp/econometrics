@@ -87,6 +87,7 @@ k <- ncol(X)
 sigma2_hat <- t(u) %*% u /(T-k)
 sigma2_hat <- sigma2_hat[,1] 
 var_Beta_hat <- sigma2_hat * solve((t(X) %*% X))
+serror = sqrt(diag(var_Beta_hat))
 
 # Restricted Model B1 = -gamma
 #Model dt = alpha0 + alpha1 dt-1 + B0 et + B1(et-1 -t) + ut
