@@ -65,12 +65,13 @@ QL
 ## Live Lecture 19/10/2020 of lecture 4
 
 Log Likelihood: We are assuming independence here in our original notes, hence the joint distribution is the product of their marginal distributions. This is not the case for a time-series but we will look at this later
---
+
 Thinking of the null hypothesis, our starting point that this is true,  if this is true and we reject it this is type 1, if this is false and we accept it then this is type 2, so type 1 is getting our starting point wrong, type two is accepting when it is false
---
+
+
 t-ratio distributed around 0 with a t-distribution if the null hypothesis is true
 
---- 
+
 We do the exact test only with normal errors and linear restrictions. 
 We do this if we want to test hypothesis or to test our estimators.
 
@@ -84,11 +85,9 @@ Example Slide: $q = [0, 1]$ is the vector that allows $\beta_2 =1$ and
 $\beta_3 = -\beta_4$. Multiply out the vectors to see. 
 
 
----
 Use BIC model selection criteria in general.
 
 
---- 
 Exams will contain output from a statistical programmes and we will be asked questions on this. 
 
 
@@ -100,7 +99,7 @@ use the F where possible when both F & $\chi^2$ are given as the later is asympt
 
 $S(\hat\theta)$, the score vector is the derivative of the LL w.r.t each of the k elements (number of co-efficents/parameters) of the vector $\theta$
 
-$\lambda^' R(\theta)$ is a scalar
+$\lambda R(\theta)$ is a scalar
 
 Q: why are we doing this restriction?
 
@@ -197,5 +196,61 @@ Omitted Variables:
 if you've left out a variable/omitted variable or have the wrong functional form then you have an error in your model. 
 
 
+## Lecture 8 - Diagnostic Tests
+
+Always look at graphs and residuals, these will explain symptoms
+
+serial correlation of errors etc (acf in R)
+
+Question on Tests: Although the justification of these tests is asymptoic, versions 
+which use the F test seem to work well in practice
+
+Question Structural Stability: In time series will this not vary over time? What happens then? I think this is addressed, we split the model into subperiods next
+
+Question: With the restricted model how do we get to $y = X \beta + u$ ? In the test statistic we revert to $u_1$ and $u_2$
+
+Question: It seems a big assumption to say the variances are the same? And when we are testing the variance ration and this is not = 1
+
+
+Question: I don't quite understand the use of dummy variables
+
+Note: Serial correlation: $\hat\beta$ might be inconsistent if there are lagged dependent variables. 
+
+So what are we doing here? We are trying to assess whether we have the correct model. Are there unknown breakpoints or structural breaks? Is there serial correlation in the residuals or there are lagged dependent variables. Heterskedascticity
+
+We run tests where the null hypothesis is that there is no problem
+
+## Live Lecture on Lecture 8
+
+Chow test is a test to compare two different estimates subsets of the same 
+
+
+Question: With the restricted model how do we get to $y = X \beta + u$ ? In the test statistic we revert to $u_1$ and $u_2$: 
+
+Because $\beta_1$ = $\beta_2$ 
+
+we have three models, $y_1 $ $y_2$ and $y$. So we have three sets of residuals
+
+Variance ration: They will never be exactly the same, it is a test of significance
+
+ok null hypothesis is that the variance is the same, we test if it is the same within a
+given level of confidence, say 5%. 
+
+and for example if the variance in our estimate of our parameter for a certain period is high, 
+then if there was a structural break we would be more likely to accept this as the same variance because of the 
+
+We can also do the above wth dummy variables
+
+This might deal with different variances. 
+
+the example we are just binding or combining the matrices. 
+
+
+In the public health Scotland data for Coronavirus. 
+
+We have a dummy variable in Care home size. THis is because if this was a continuous variable there might be large jumps and steps. We bucket here so it is more consistent and we use a dummy variable. So for a given observation this will either be 1 or 0. So we will have a variable for < 20 , 20-30, 30-40, 50-60 etc. 
+
+
+Note: Unknown breakpoint - searching for a regime change if we do not know it. These do not have great power however, see $(1-0.95^4)$
 
 

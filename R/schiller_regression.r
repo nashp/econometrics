@@ -89,10 +89,27 @@ sigma2_hat <- sigma2_hat[,1]
 var_Beta_hat <- sigma2_hat * solve((t(X) %*% X))
 serror = sqrt(diag(var_Beta_hat))
 
+tration <- Beta_hat / serror # Higher more significant
+
+
 # Restricted Model B1 = -gamma
 #Model dt = alpha0 + alpha1 dt-1 + B0 et + B1(et-1 -t) + ut
 Xr <- cbind(X[,1:3], X[,4] - X[, 5])
 
 beta_hat_restricted <- solve(t(Xr) %*% Xr) %*% t(Xr) %*% y
 
+ 
 u_restricted <- Xr %*% beta_hat_restricted - y
+
+#TEsting auto correlation 
+
+durbinWatsonTest(model=as.vector(static_model_residuals))
+durbinWatsonTest(model=as.vector(u))
+durbinWatsonTest(model=as.vector(u_restricted))
+
+# Hyphothesis test like in tutorial
+
+# Chisq is the Wald Test
+linearHypothesis(reg,c("sh_data$trend = 0","sh_data$LDlag + sh_data$LE + sh_data$LElag -1  = 0"),test="Chisq")
+
+
