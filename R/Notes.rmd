@@ -253,4 +253,20 @@ We have a dummy variable in Care home size. THis is because if this was a contin
 
 Note: Unknown breakpoint - searching for a regime change if we do not know it. These do not have great power however, see $(1-0.95^4)$
 
+### Week 5 Online Lecture (2020-11-02)
+
+Stationarity: A distribution can be strongly stationary but not weakly stationary as they may not have defined moments
+
+Order of integration: The number of times a series must be differenced before it becomes stationary
+
+Question: Does taking the log make something stationary? Like in our log gdp life expectancy?
+
+Question: What is AR1? THe lag or univariate?
+
+Question: Variance of $y_{t}^2$?
+
+Question: Mean is consant? If this is not stationary then this may not be true?
+
+Question: Random walks? What are we to take from this? We will need to check if a series is a random walk?Same with MA, these are particular cases of univariate models? 
+
 
