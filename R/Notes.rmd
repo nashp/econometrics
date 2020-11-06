@@ -269,4 +269,11 @@ Question: Mean is consant? If this is not stationary then this may not be true?
 
 Question: Random walks? What are we to take from this? We will need to check if a series is a random walk?Same with MA, these are particular cases of univariate models? 
 
+### Week 5 Online Lecture
+
+Okay so ARIMA (p, d, q) how many times we difference, d, our moving average q, and our lags p
+
+
+I don't quite undersdant the detrendint of the data, Frish Waugh theorem, 
+what is $y_t$
 
