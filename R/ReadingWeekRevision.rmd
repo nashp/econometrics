@@ -1,0 +1,164 @@
+---
+title: "Revision (ReadingWeek)"
+author: "Peter Nash"
+date: "09/11/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 1/Lecture 1
+
+We begin with the linear regression model 
+$y_t = \beta_0 + \beta_1 x_t + u_t$
+
+We will look at three ways of estimating it
+
+1) Method of moments
+2) Least Squares
+3) Maximum Likelihood
+
+We need to make assumptions. 
+
+1) $E(u_t) = 0$, zero mean
+2) We assume the errors are of constant variance or homoskedastic, $E(u^2_t) = \sigma^2$
+3) We assume the errors are not autocorrelated $E(u_t u_{t-i})$
+4) We require $X_t$ to vary and are exogenous i.e $X_t%$ and $u_t$ are not correlated
+This implies $E(u_t) = 0$ and $E(X_t u_t) = 0$
+
+First method of moments
+
+So we can use our two assumptions in 4 to give two equations for two unknowns. We substitute
+in $u_t = y_t - \beta_0 _ \beta_1 x_t$ into the two assumptions in 4 and solve for 
+$\beta_0$ and $\beta_1$
+
+Now Least Squares:
+
+So least squares aims to find the values that minimise $S = \Sigma_t \hat{u}^2_t$
+
+*Note*: Look at differentiation here
+
+Again substitute in $u_t = y_t - \beta_0 _ \beta_1 x_t$. Multiply out then we
+differentiate $S$ with respect to $\beta$
+
+Properties: 
+
+The estimator is unbiased 
+
+i.e. $E(\hat{\beta}) = \beta$
+
+We want to show
+
+$E(\hat{\beta} - \beta) = 0$
+
+We look get $\hat{\beta} - \beta = 0$, take expectation and work from there. 
+we use our  assumptions that $E(u_t) = 0$ and $E(X_t u_t) = 0$, exogeneity
+
+We show the variance is
+
+$V(\hat{\beta}) = \sigma^2/\Sigma_t x_t$
+
+## Week 1/Lecture 2
+
+Now we look at matrix algebra and multiple regression
+
+so we have 
+
+$y = X \beta + u$ where $y$ is T x 1,$X$ is T x k and $u$ is T x 1
+
+and now our assumptions $E(u^2_t) = \sigma^2$
+
+this becomes $E(u u') = \sigma^2 I$, if one multiplies out $u u'$ this becomes apparent
+and we can use $E(u^2_t) = \sigma^2$ and $E(u_t u_{t-i}) = 0$
+
+Our assumptions: 
+
+No exact multicollinearity, if it is then X is not full rank (it should be of rank k) and
+we cannot take the inverse of $X'X$, it is non singular. 
+
+Our exogeneity assumption is $E(X'u) = 0$. 
+
+The explanatory variables in X are either
+1) non stochastic
+2) strictly exogenous, ie independent of the errors
+3) pre-determined, uncorrelated
+
+if 1 & 2 hold then the estimator is unbiased.
+if 3 holds then it is biased but consistent ie as the sample increases the bias decreases
+
+For Method of Moments we use  $E(X'u) = 0$, plug in $y - X\hat{\beta}$ for $u$ and solve
+
+*Note* Check how $E(X'u) = 0$ is like $X'\hat{u} = 0$
+Similarly for Least Squares
+
+We find $\hat\beta$ that minimises $\hat u' \hat u$ . Substitute in again.
+
+Remmber the trick of transposing and reversing to make some terms alike. 
+
+Quadratic form, this is $x' A x$
+
+We get something of the form $y' y - 2\hat\beta X' y + \hat\beta X'X \hat\beta$. 
+Taking the derivative of the last term is like taking the derivative of a quadritic so we will get
+$2 X' X \hat \beta$, where is the transpose? this is constructed so we will have a row vector of betas
+otherwise it would not work. It gives us a k x 1 vector, it looks like we are taking the derivative of $\beta'$ but we are not. See notes.Take second derivative $2 X'X$is positive definite so this is a minimum.
+
+Check if the estimator is biased again. Similar as before using our exogoneity assumptions. 
+
+If the exogoneity assumption fails then it is not unbiased. 
+
+Variance: 
+
+$V(\hat\beta) = E(\hat\beta - E(\hat\beta))(\hat\beta - E(\hat\beta))'$ work out
+
+$E(\hat\beta - \beta)(\hat\beta - \beta)' = \sigma^2(X'X)^{-1}$ We use our assumption that 
+$E(u'u) =0$, homogeneity. If not then we will have our $\Omega$ in the middle here. Like
+$\sigma^2 (X'X)^{-1}X'\Omega X(X'X)^{-1}$ This heterogenous or heteresketastic which means our estimator is 
+unbiased bit it is not minimum variance i.e. not efficient
+
+Remember we estimate $V(\hat\beta)= s^2(X'X)^{-1}$ where $s^2 = \hat u' \hat u/(T-k)$.
+
+*Note* If you can't fix the serial correlation use robust standard errors
+
+Now Predicted values and residuals
+
+$\hat u = y - X \hat \beta = My$ where $P_x = X(X'X)^{-1}X' ; M = I - P_x $ where P is our 
+projection matrix. 
+
+*Note* need to find out what this is exactly for
+
+but it allows us to estimate $\sigma^2$ because $E(\hat u' \hat u) = \sigma^2(T-k)$ so 
+$\sigma^2 = E(\hat u' u) / (T-k)$, and take the expectation of both sides, expectation of an expectation 
+is a constant so we will get $\sigma^2 = \hat u'\hat u / (T-k)$
+
+Goodness of fit
+
+$R^2$ will always improve as you add a variable, standard error much better
+
+Gauss-Markov Theorem
+
+It is BLUE, Best Linear Unbiased Estimtor if we assume
+
+$E(u) = 0; E(u u') = \sigma^2 I$, X is of full rank k
+
+Tutorial 1 will go through this
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
