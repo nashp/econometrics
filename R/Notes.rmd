@@ -277,3 +277,45 @@ Okay so ARIMA (p, d, q) how many times we difference, d, our moving average q, a
 I don't quite undersdant the detrendint of the data, Frish Waugh theorem, 
 what is $y_t$
 
+### Live Lecure week 5
+
+We should be able to write down these processes and estimate them
+
+Common factors: Basically saying that sometimes you can estimate an ARIMA model but it is actually a random walk, need to check the joint significance, 
+
+If it was a true ARIMA then the coefficients on the AR and MA would be different and would be jointly significant
+
+Comparing different models via AIC,BIC comes into play here
+
+Frisch-Waugh Slide: Should we include trend in the equation or detrend 
+
+Ok so $y\tilde$ and $x\tilde$ are the error residuals, so we say we want to look at what is left over after looking at particular variable, or controllign for a particular variable what is lef tover, we then estimate the residuals on this
+
+Trend and difference: Because in the random walk there is no $\rho$ which if it is less than one acts as damping factor in the AR model. And remember if we have AR of order p, then this $\rho$ will get multiplied out so like $\rho^3 y_{t-1}$ so this will become less and less. Multiply out the expression to see. Also look at previous lecture notes.
+
+Why don't we want a trend in the change $\Delta y$? A trend in change is quadratic trend in level 
+
+This will play a roll with co-integration later on
+
+Unit Roots: Something you need to know if you're doing time series analysis. 
+
+Q: Is there a unit root in log GNP? Do we know? Do we care? paper
+
+Sometimes over the longer period it might be $I(1)$
+
+An $I(0)$ process with a step change will appear $I(1)$
+
+Unit Roots:
+
+example $y_t = \rho y_{t-1} + \epsilon_t$
+
+For stability the soltuion to $(1  - \rho z) = 0$
+
+One of the reasons first difference models is good for forecasting , you do not go back to some equilibrium or trend, might be good for forecasting but not good for understanding what is going on 
+
+
+Make sure algebra of AR etc, make sure we know restrictions, 
+
+The long run multiplier is what the ARDL system looks like after it settles down, given $|\rho| < 1$. So in our practical example this was $\beta_0 + \beta_1 / (1 - \alpha_1)$. This is known as the long run elasticity if the variables are in log form. This is a good example 
+https://www.youtube.com/watch?v=ID96csw4yso&ab_channel=MarginalRevolutionUniversity
+

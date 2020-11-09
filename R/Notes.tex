@@ -1,0 +1,481 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={Notes},
+            pdfauthor={Peter Nash},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs}
+% Fix footnotes in tables (requires footnote package)
+\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{long table}}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Notes}
+\author{Peter Nash}
+\date{18/10/2020}
+
+\begin{document}
+\maketitle
+
+\subsection{Notes}\label{notes}
+
+\subsection{Lecture 3 Notes}\label{lecture-3-notes}
+
+For ML we will always need to specify the distribution. We are asking
+what value of theta given the observations we have seen from an
+assumed/known distribution.
+
+How does the information matrix relate to the Variance? The information
+matrix is the second derivative of the the log likelihood, so the slope
+of the slope, if we have determined the slope and that in itself is not
+steep then it is hard to pinpoint where our solution lies, (thinking
+along 2d lines if we have a line of very small slope any small change in
+y can lead to a large change in X so hard to pinpoint our variable, if
+it is steeper a small change in y will lead to a small change in x so
+easier to estimate our paramater) so if the second derivative is small,
+or information martix is small, then the variance in our estimate of our
+paramater can be large. If the second derivative is large then the
+information matrix is large and variance in our estimator is less.
+
+The ML estimator is normally distributed and is efficient.
+
+Log Likelihood: We are assuming independence here in our original notes,
+hence the joint distribution is the product of their marginal
+distributions. This is not the case for a time-series but we will look
+at this later. (Assume a product of their conditional distributions and
+marginals)
+
+\subsection{Questions}\label{questions}
+
+The example in Log likelihood
+\(L(\theta) = f(y_1, \theta)f(y_2, \theta)f(y_T, \theta)\), we are
+assuming each sample is independent, what if this is not the case?
+e.g.~if \(y_t\) is not independent of \(y_{t-1}\), e.g.~if we take the
+price of an equity this is not indpendent, but if we take the return
+this would be independent.
+
+\section{Tutorial 2 Covering Log
+Likelihood}\label{tutorial-2-covering-log-likelihood}
+
+We are choosing the value of theta which maximises our probability
+density function. Higher joint probability distribution , higher
+probability, implies more likely
+
+\url{https://www.youtube.com/watch?v=XepXtl9YKwc\&vl=en\&ab_channel=StatQuestwithJoshStarmer}
+
+towardsdatascience.com/maximum-likelihood-estimation-explained-normal-distribution-6207b322e47f
+
+arg max notation, the argument that maximises
+\(arg max_{\theta E \Theta}\) \#\# Lecture 5 Notes
+
+Looking at testing and inference. Could this estimate have happened by
+chance. We will look at distributions of the estimators.
+
+If the p-value is small it is unlikely that the estimate was generated
+by the true value
+
+p-value think about it as the probability the null hypothesis is true
+
+why is individual null hypthoses a t-test and join and f-test?, how is
+this linked to what we saw ,
+
+Joint and individual tests can conflict
+
+trying to link the linear restrictions we impose with what
+
+so our restrictions are our hypotheses. So if \(\beta\) is a kx1 vector
+of parameters then \(R\beta = q\) is just like \(\beta_0 = u\),
+\(\beta_1 - v\), \(\beta_2 = w\)
+
+QL
+
+\subsection{Live Lecture 19/10/2020 of lecture
+4}\label{live-lecture-19102020-of-lecture-4}
+
+Log Likelihood: We are assuming independence here in our original notes,
+hence the joint distribution is the product of their marginal
+distributions. This is not the case for a time-series but we will look
+at this later
+
+Thinking of the null hypothesis, our starting point that this is true,
+if this is true and we reject it this is type 1, if this is false and we
+accept it then this is type 2, so type 1 is getting our starting point
+wrong, type two is accepting when it is false
+
+t-ratio distributed around 0 with a t-distribution if the null
+hypothesis is true
+
+We do the exact test only with normal errors and linear restrictions. We
+do this if we want to test hypothesis or to test our estimators.
+
+So with the exact test we know the exact distribution rather than using
+an asymptotic distribution e.g.~normal. For example a standard normal we
+would be looking at += 1.96 where as a t-distribution would be += 2.04,
+this means that we would be less likely to reject the null hypothesis.
+And remember as samples increase the t-distribution becomes more like
+the normal
+
+in \(R \beta = q\) we are doing this purely for the algebra.
+
+Example Slide: \(q = [0, 1]\) is the vector that allows \(\beta_2 =1\)
+and \(\beta_3 = -\beta_4\). Multiply out the vectors to see.
+
+Use BIC model selection criteria in general.
+
+Exams will contain output from a statistical programmes and we will be
+asked questions on this.
+
+\subsection{Lecture 6 Asymptotic Test
+Proceedures.}\label{lecture-6-asymptotic-test-proceedures.}
+
+If we can't get exact results we look at asymptotic approximations, we
+are more likely to reject using this
+
+use the F where possible when both F \& \(\chi^2\) are given as the
+later is asymptotic and F is exact
+
+\(S(\hat\theta)\), the score vector is the derivative of the LL w.r.t
+each of the k elements (number of co-efficents/parameters) of the vector
+\(\theta\)
+
+\(\lambda R(\theta)\) is a scalar
+
+Q: why are we doing this restriction?
+
+The restrictions are our hypotheses, if they are trye, the two log
+likelihood should be similar \(LL(\theta) - LL(\theta^\star)\), See
+lecture 5 above
+
+Q: Maybe speak about how the hypotheses and restrictions are alike
+
+\begin{itemize}
+\tightlist
+\item
+  Test Procedures \(R(\hat\theta)\) has the same structure as
+  \(R\hat{\beta} - q\)
+\end{itemize}
+
+*Note: The difference between Legrange multiplier is that the variance
+covariance matrix in the Wald is evaluated at \(\hat\theta\) versus
+\(\theta^{\star}\)
+
+\begin{itemize}
+\tightlist
+\item
+  Source of non linear restrictions
+\end{itemize}
+
+Q: What is the restricted and non restricted Model?
+
+Is \(\rho\) the correlation co-efficient?
+
+Where doe our hypothesis
+\(H_0: R_m(\theta) = \theta_1\theta_2 - \theta_3 =0\) originate from?
+
+-- Bootstrap
+
+Q: THis can be applied to any of the estimators we've used?
+
+Bootrap food for small sample estimates
+
+ARDL model is what we look at in week 3 of the practicals.
+
+\subsection{Live Lecture 23/10/2020 (lecture
+6)}\label{live-lecture-23102020-lecture-6}
+
+Restrictions Hypotheses are the same things,
+
+So tip: Start from a general model and then begin to impose restrictions
+
+e.g Start with normal LRM, but if we observe some autocorrelation then
+model this
+
+See Source of non linear restrictions
+
+so see \(y_t = \beta x_t -\rho\beta x_{t-1} + \rho y_{t-1}\)
+
+we can say \(\alpha = \rho\) and \$ \beta\_1 = \alpha  \beta\_0\$
+
+equation 3 is our restricted model, equation 2 is our unrestricted, if
+we impose a restriction we reduce the number of variables
+
+Non-linear estimation
+
+Why is it non linear? We are multiplying \(\rho\) and \(\beta\),
+multiplicative affect
+
+\begin{longtable}[]{@{}l@{}}
+\toprule
+\begin{minipage}[t]{0.03\columnwidth}\raggedright\strut
+in final equation, generalised least squares.\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.03\columnwidth}\raggedright\strut
+\(y_t - \rho y_{t-1}\) is on the left hand side as we know this \(y_t\)
+and \(y_{t-1}\) and we make an initial estimate of \rho\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+The serial correlation of the errors implies that the previous value of
+the variable affects the current value
+
+-- Recommended reading
+
+`A guide to Econometrics' KEnnedy Stock and Watson - from Ron Verbeek -
+closest to the course
+
+\subsection{Lecture 7 26/10/2020}\label{lecture-7-26102020}
+
+We are looking at what happens when models fail or our assumptions fail
+
+LRM is designed to handle correlation between variables. It will lead to
+a higher standard error.
+
+Multicollinearity or issues arising from it are not something to worry
+unduly about. They are not one of our main assumptions
+
+Always plot at and look at the residuals, YOU WILL BE PENALISED in your
+project if you don't look at outliers, structural breaks etc.
+
+Q: In Gauss LRM: How have you come by the variance of \(\hat \beta\) in
+first term
+
+Q: Could you explain more about respecifying the model? \& Dummy
+variable trap
+
+Q: Can we test exogeneity simply by looking at the correlation ofX \& u?
+
+Q: With \(\Omega\) we get 0 off diagonals because,
+\(E[u_t u_{t-i}] = 0\) \# (serial correlation or autocorrelation)
+
+Q: In GLS we see the distribution contains \(\Omega\), to the following
+results are just the result of maximising the Log-Likelihood? Log of
+distribution, take the first and second derivatives w.r.t the paramaters
+\#\# Live Lecture for lecture 7 26/10/2020
+
+Omitted Variables:
+
+if you've left out a variable/omitted variable or have the wrong
+functional form then you have an error in your model.
+
+\subsection{Lecture 8 - Diagnostic
+Tests}\label{lecture-8---diagnostic-tests}
+
+Always look at graphs and residuals, these will explain symptoms
+
+serial correlation of errors etc (acf in R)
+
+Question on Tests: Although the justification of these tests is
+asymptoic, versions which use the F test seem to work well in practice
+
+Question Structural Stability: In time series will this not vary over
+time? What happens then? I think this is addressed, we split the model
+into subperiods next
+
+Question: With the restricted model how do we get to \(y = X \beta + u\)
+? In the test statistic we revert to \(u_1\) and \(u_2\)
+
+Question: It seems a big assumption to say the variances are the same?
+And when we are testing the variance ration and this is not = 1
+
+Question: I don't quite understand the use of dummy variables
+
+Note: Serial correlation: \(\hat\beta\) might be inconsistent if there
+are lagged dependent variables.
+
+So what are we doing here? We are trying to assess whether we have the
+correct model. Are there unknown breakpoints or structural breaks? Is
+there serial correlation in the residuals or there are lagged dependent
+variables. Heterskedascticity
+
+We run tests where the null hypothesis is that there is no problem
+
+\subsection{Live Lecture on Lecture 8}\label{live-lecture-on-lecture-8}
+
+Chow test is a test to compare two different estimates subsets of the
+same
+
+Question: With the restricted model how do we get to \(y = X \beta + u\)
+? In the test statistic we revert to \(u_1\) and \(u_2\):
+
+Because \(\beta_1\) = \(\beta_2\)
+
+we have three models, \$y\_1 \$ \(y_2\) and \(y\). So we have three sets
+of residuals
+
+Variance ration: They will never be exactly the same, it is a test of
+significance
+
+ok null hypothesis is that the variance is the same, we test if it is
+the same within a given level of confidence, say 5\%.
+
+and for example if the variance in our estimate of our parameter for a
+certain period is high, then if there was a structural break we would be
+more likely to accept this as the same variance because of the
+
+We can also do the above wth dummy variables
+
+This might deal with different variances.
+
+the example we are just binding or combining the matrices.
+
+In the public health Scotland data for Coronavirus.
+
+We have a dummy variable in Care home size. THis is because if this was
+a continuous variable there might be large jumps and steps. We bucket
+here so it is more consistent and we use a dummy variable. So for a
+given observation this will either be 1 or 0. So we will have a variable
+for \textless{} 20 , 20-30, 30-40, 50-60 etc.
+
+Note: Unknown breakpoint - searching for a regime change if we do not
+know it. These do not have great power however, see \((1-0.95^4)\)
+
+\subsubsection{Week 5 Online Lecture
+(2020-11-02)}\label{week-5-online-lecture-2020-11-02}
+
+Stationarity: A distribution can be strongly stationary but not weakly
+stationary as they may not have defined moments
+
+Order of integration: The number of times a series must be differenced
+before it becomes stationary
+
+Question: Does taking the log make something stationary? Like in our log
+gdp life expectancy?
+
+Question: What is AR1? THe lag or univariate?
+
+Question: Variance of \(y_{t}^2\)?
+
+Question: Mean is consant? If this is not stationary then this may not
+be true?
+
+Question: Random walks? What are we to take from this? We will need to
+check if a series is a random walk?Same with MA, these are particular
+cases of univariate models?
+
+\subsubsection{Week 5 Online Lecture}\label{week-5-online-lecture}
+
+Okay so ARIMA (p, d, q) how many times we difference, d, our moving
+average q, and our lags p
+
+I don't quite undersdant the detrendint of the data, Frish Waugh
+theorem, what is \(y_t\)
+
+\subsubsection{Live Lecure week 5}\label{live-lecure-week-5}
+
+We should be able to write down these processes and estimate them
+
+Common factors: Basically saying that sometimes you can estimate an
+ARIMA model but it is actually a random walk, need to check the joint
+significance,
+
+If it was a true ARIMA then the coefficients on the AR and MA would be
+different and would be jointly significant
+
+Comparing different models via AIC,BIC comes into play here
+
+Frisch-Waugh Slide: Should we include trend in the equation or detrend
+
+Ok so \(y\tilde\) and \(x\tilde\) are the error residuals, so we say we
+want to look at what is left over after looking at particular variable,
+or controllign for a particular variable what is lef tover, we then
+estimate the residuals on this
+
+Trend and difference: Because in the random walk there is no \(\rho\)
+which if it is less than one acts as damping factor in the AR model. And
+remember if we have AR of order p, then this \(\rho\) will get
+multiplied out so like \(\rho^3 y_{t-1}\) so this will become less and
+less. Multiply out the expression to see. Also look at previous lecture
+notes.
+
+Why don't we want a trend in the change \(\Delta y\)? A trend in change
+is quadratic trend in level
+
+This will play a roll with co-integration later on
+
+Unit Roots: Something you need to know if you're doing time series
+analysis.
+
+Q: Is there a unit root in log GNP? Do we know? Do we care? paper
+
+Sometimes over the longer period it might be \(I(1)\)
+
+An \(I(0)\) process with a step change will appear \(I(1)\)
+
+Unit Roots:
+
+example \(y_t = \rho y_{t-1} + \epsilon_t\)
+
+For stability the soltuion to \((1 - \rho z) = 0\)
+
+One of the reasons first difference models is good for forecasting , you
+do not go back to some equilibrium or trend, might be good for
+forecasting but not good for understanding what is going on
+
+Make sure algebra of AR etc, make sure we know restrictions,
+
+The long run multiplier is what the ARDL system looks like after it
+settles down, given \(|\rho| < 1\). So in our practical example this was
+\(\beta_0 + \beta_1 / (1 - \alpha_1)\). This is known as the long run
+elasticity if the variables are in log form. This is a good example
+\url{https://www.youtube.com/watch?v=ID96csw4yso\&ab_channel=MarginalRevolutionUniversity}
+
+\end{document}
