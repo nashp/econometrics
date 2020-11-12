@@ -95,7 +95,9 @@ Similarly for Least Squares
 
 We find $\hat\beta$ that minimises $\hat u' \hat u$ . Substitute in again.
 
-Remmber the trick of transposing and reversing to make some terms alike. 
+Remember to look at the items that are scalars, these can be switched around 
+$y'X\hat\beta = \hat\beta'X'y$
+. 
 
 Quadratic form, this is $x' A x$
 
@@ -179,6 +181,15 @@ When we look at asymptotic distributions we scale by $\sqrt(T)$
 Small second derivative, means we are not sure exactly where our solution is, move up or down and not much changes, larger second derivative means the slope is steeper, so we can pinpoint our solution better, remember first derivative is slope and second derivative is how steep that slope is or how it changes. 
 
 The ML estimator is asymptotically normally distributed and is efficient asymptotically
+
+Some ML estimators are unbiased and some are biased. Unbiasedness is not a property.
+
+Logit or log odds,
+
+Non Linear estimation 
+
+
+
 
 
 
