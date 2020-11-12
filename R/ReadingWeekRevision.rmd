@@ -206,6 +206,19 @@ So out $LL(\beta, \sigma^2) = = -T/2 log(2\pi) - T/2 log(\sigma^2) - 1/s\sigma^2
 
 $u = y - X\beta$ so we can take the derivative of this like we did before, see above for u'u
 
+So if we have the MLL we can test AIC and BIC, so good way of comparing models
+
+You cannot compare models thave have different transformations on the dependent variable. e.g log(y) vs y
+
+The end of this lecture looks at transformations and how to interpret regression coefficients, this is very important. Knowing AIC will be important for the exam and how to interpret coefficients
+
+
+
+
+*Questions*
+
+Why is $E[u' u ] = T \sigma^2$
+
 
 
 
