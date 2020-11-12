@@ -188,6 +188,26 @@ Logit or log odds,
 
 Non Linear estimation 
 
+Gradient descent methods to try and find a solution for the 
+
+### Week 2/Lecture 4
+
+ML as applied to the LRM 
+
+We look at the normal distribution, that is we assume our observations are drawn from 
+a normal distribution with mean 0 and variance $\sigma^2$
+
+$L(\beta, \sigma^2) = (2 \pi \sigma^2)^{-T/2} e^{u'u/2 \sigma^2}$
+
+First of all we take the derivative wrt to beta to get the score vector, then we take 
+the derivative wrt to $\sigma ^2$ NOT $\sigma$, this is key
+
+So out $LL(\beta, \sigma^2) = = -T/2 log(2\pi) - T/2 log(\sigma^2) - 1/s\sigma^2 u'u$
+
+$u = y - X\beta$ so we can take the derivative of this like we did before, see above for u'u
+
+
+
 
 
 
