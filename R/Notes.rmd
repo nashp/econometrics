@@ -319,3 +319,26 @@ Make sure algebra of AR etc, make sure we know restrictions,
 The long run multiplier is what the ARDL system looks like after it settles down, given $|\rho| < 1$. So in our practical example this was $\beta_0 + \beta_1 / (1 - \alpha_1)$. This is known as the long run elasticity if the variables are in log form. This is a good example 
 https://www.youtube.com/watch?v=ID96csw4yso&ab_channel=MarginalRevolutionUniversity
 
+
+### Week 6/Dynamic Regression
+
+ARDL model 
+
+ARDL is stationaru if the roots of the process lie outside the unit circl, check by sum $-1 <\Sigma \alpha_i < 1$ in practice
+
+Long run relation: so we estimate the coefficients and then we assume y/x are static
+i.e $y_{t-i} = y$. We never observe the long run, or this stable equilibrium, but 
+we can infer things from it.
+
+In Schiller we wanted to test the long run elasticity = 1, see our restricted model
+
+*Question* Could you go through the ECM model again, maybe thinking more about examples where we would use it and why?
+
+Restrictions should always go from general to specific. 
+
+If you regress something on the intercept the answer is the mean?
+
+Unit long run coefficient = 1, look into this a bit more, this is like our Schiller example. We can 
+restrict our model with this. 
+
+
