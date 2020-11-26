@@ -342,3 +342,46 @@ Unit long run coefficient = 1, look into this a bit more, this is like our Schil
 restrict our model with this. 
 
 
+### Week 6/Live lecture
+
+
+If $u_t$ is independent of $y_{t}$ it is independent
+
+If an AR model is stable then it is stationary, stable means unit roots outside the unit circle. 
+
+What do the coefficients mean in ARDL ?
+
+
+
+Taylor rule & r*
+
+
+### Week 7 / Tutorial
+
+In the MA we know the epsilons as we start with epsilon 0, we can back out this n umber
+
+this is estimated my ML
+
+### 
+  $d_t = \alpha_0 + \beta_0 e_t + \beta_1 e_{t-1} + \alpha_1 d_{t-1} + u_t$
+
+
+### Week 8
+
+VAR - like Autregressive models, $y_t$, 
+
+it is not exogenous, it is not unbiased, but is consistent 
+
+
+degrees of freedom are important, the more lags and 
+
+endogenous means they are eplained by the system, they are not independent of the error terms but they are uncorrelated. we can say they are uncorrelated because e1t happens after y1t-1, they are not uncorrelated, e1t is related to y1t
+
+y1t, y2t are dependent on the system so they are endogenous, 
+
+
+1 root on the unit circle means there is (could be?) a stochastic trend
+
+gives you an ordering of variables, causal structure
+
+

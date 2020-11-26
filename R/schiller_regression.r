@@ -73,8 +73,8 @@ ggplot(data=sh_data) +
 # multi parameter model
 
 # ld = alpha_0 + alpha_1 * ld_t-1 + beta_0 * le_t + beta_1 * le_t-1 + gamma * t + ut
-
-reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag + sh_data$trend)
+# y = alpha_0 + alpha_1 y_y-1 + beta_0 * x_t + beta_1 * x_{t-1} + gamma * t + u_{t}
+reg <- lm(sh_data$LD ~ sh_data$LDlag + sh_data$LE + sh_data$LElag)# + sh_data$trend)
 summary(reg)
 durbinWatsonTest(reg) #Better but not yet 2
 # We can see that lagged dividends 
@@ -146,5 +146,7 @@ Ftest <- denominator / numerator
 if(Ftest > qf(0.95, df1=m, df2=T-k)) {
   print("We reject the null hypothesis")
 }
+
+
 
 

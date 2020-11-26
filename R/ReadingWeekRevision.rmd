@@ -213,11 +213,31 @@ You cannot compare models thave have different transformations on the dependent 
 The end of this lecture looks at transformations and how to interpret regression coefficients, this is very important. Knowing AIC will be important for the exam and how to interpret coefficients
 
 
-
-
 *Questions*
 
 Why is $E[u' u ] = T \sigma^2$
+
+### Week 3/Tutorial 
+
+Some observations: Walter works with the average likelikehood or average log likelihood. This is because sample averages of iid random variables obey certain limit laws like law of large numbers and central limit theorem. However maximising any of these does not make a difference as you will always get the same maximiser. But Walter works with average log likelihood and Ron works with log likelihood
+
+If the hessian is large, then the peak is sharp
+
+Sharper peak (remember second derivative is slope of slope, first derivative gives the slope of the function then second derivative tells us how steep that slope is or if it is going up or down and by how much), means bigger information matrix (in a positive definite sense), which gives us a better estimate. A smaller Information matrix (in a psd sense) means a less clear solution, smaller peak, so harder to determine our solution for our estimate, leading to higher variance. 
+
+Bigger information matrix, smaller variance-covariance matrix of our estimator. .
+  
+Asymptotic distribution of MLE is normal
+
+Safe thing to do is to use the average 
+
+
+
+### Week 3/Lecture 6A
+
+Asymptotic Test 
+
+We look at the unrestricted estimates for the MLE
 
 
 
