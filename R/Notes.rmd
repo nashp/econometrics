@@ -385,3 +385,12 @@ y1t, y2t are dependent on the system so they are endogenous,
 gives you an ordering of variables, causal structure
 
 
+### Week 8/Tutorial
+
+If the process is not stationary then the mean and the variance do not exist, ie if we look back at last week we will be dividing by $\rho - 1$, if $\rho = 1$ then this will not be finite. We had in the last tutorial the mean of an AR =  $\alpha / (\rho - 1)$
+
+covariance stationarity - moments do not depend on calendar time
+
+t-test is a one tailed test, we are only interested on B=0, B<0, if the
+
+
