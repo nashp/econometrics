@@ -7,11 +7,11 @@ library(car)
 library(xts)
 library(tseries)
 library(urca)
-sh_data <- read_excel("../data/Shiller16.xlsx")
+raw_data <- read_excel("../data/Shiller16.xlsx")
 
 # Because ND & NE have very notiecable trends we can 
 # take logs to make these more linear or take a ratio in PO (payout ratio)
-sh_data <- sh_data %>% 
+sh_data <- raw_data %>% 
   dplyr::mutate(lNSP = log(NSP), 
                 dlNSP = lNSP - dplyr::lag(lNSP, n = 1), 
                 LD = log(ND), 
@@ -24,16 +24,17 @@ sh_data <- sh_data %>%
                 DeltaD = LD - LDlag,
                 DeltaE = LE - LElag, 
                 DeltalNSP = lNSP - dplyr::lag(lNSP),
-                lPE = log(NSP/NE)) %>%
-  filter(is.finite(NE), is.finite(ND))
+                lPE = log(NSP/NE)) %>% dplyr::filter(YEAR >= 1873)
 
 st = xts(sh_data$lNSP, order.by = as.Date.yearmon(sh_data$YEAR))
 pe <-xts(sh_data$lPE, order.by = as.Date.yearmon(sh_data$YEAR))
 
 adf.test(sh_data$lNSP)
-test <- ur.df(sh_data$lNSP)
+test <- ur.df(sh_data$lNSP, type=c("trend"), lags=0)
 summary(test)
 adf.model <- lm(DeltalNSP ~ trend + lNSPlag, data=sh_data)
+
+ar1 <- lm(lNSP ~ lNSPlag + trend, data=sh_data)
 
 # st = a1 + b1 st-1 + c1 t + e ARIMA(1, 0, 0)
 ar1__ = arima(st, order=c(1, 0, 0), method="ML")
@@ -45,22 +46,22 @@ cv <- qt(0.025, df=length(st))
 AIC(ar1__)
 BIC(ar1__)
 # ARIMA(0,1, 0) delta st = a1 + et
-ar_1_ = arima(st, order=c(0, 1, 0))
+ar_1_ = arima(st, order=c(0, 1, 0), method="ML")
 AIC(ar_1_)
 BIC(ar_1_)
 
 # delta st = a1 + b2 delta st-1 et + c1 et-1
-ar111 = arima(st, order=c(1, 1, 1))
+ar111 = arima(st, order=c(1, 1, 1), method="ML")
 AIC(ar111)
 BIC(ar111)
 
 # ARIMA(1, 1, 0) delta st = a1 + b2 delta st-1 + et
-ar11_ = arima(st, order=c(1, 1, 0))
+ar11_ = arima(st, order=c(1, 1, 0), method="ML")
 AIC(ar11_)
 BIC(ar11_)
-
+ga
 # ARIMA (0, 1, 1) delta st = a1 + et +  c1 et-1 
-ar_11 = arima(st, order=c(0, 1, 1))
+ar_11 = arima(st, order=c(0, 1, 1), method="ML")
 AIC(ar_11)
 BIC(ar_11)
 
