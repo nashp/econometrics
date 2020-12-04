@@ -393,4 +393,22 @@ covariance stationarity - moments do not depend on calendar time
 
 t-test is a one tailed test, we are only interested on B=0, B<0, if the
 
+### Week 9 tutorial
+
+We use these ideas to impose restrictions on our general ARDL model. 
+
+In example 1, we use these two long run relationships, to go from 6 variables down to 4 in an Error correction model. 
+
+In example 2 we use the common factor/AR1 restriction to go from 6 factors down to two. The common factor/AR1 restriction gives us two restrictions
+
+These are examples of a restricted ARDL model 
+
+In the next example we consider an ECM model in order to impose restrictions. This ECM only gives 1 restrictions. The ECM model in example 1 gave us two parameters. 
+
+Wald Test 
+
+F-test that uses on the sum of squares residuals, 
+
+
+
 
