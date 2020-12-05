@@ -410,5 +410,10 @@ Wald Test
 F-test that uses on the sum of squares residuals, 
 
 
+### Week 9 / Friday Lecture intrumental variables
+
+We use these because we do not know which way the correlation goes between X and Y in our standard linear model. So the equation $\beta = (W'X) W'y$ so in the top line in $W'y$ is the impact of W through X, but we try and control for the correlation between W and X $W' X$ so we divide by this.
+
+
 
 
