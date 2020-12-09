@@ -51,7 +51,7 @@ full.dyn.model <- dyn$lm(d.sub ~ d.sub.l +
                            e.sub + 
                            e.sub.l + 
                            p.sub + 
-                           p.sub.l
+                           p.sub.l)
 summary(full.dyn.model)
 # Restricted Model 1
 
