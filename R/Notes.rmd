@@ -415,5 +415,13 @@ F-test that uses on the sum of squares residuals,
 We use these because we do not know which way the correlation goes between X and Y in our standard linear model. So the equation $\beta = (W'X) W'y$ so in the top line in $W'y$ is the impact of W through X, but we try and control for the correlation between W and X $W' X$ so we divide by this.
 
 
+### Week 10 / Live lecture / Bayesian Stats
+
+We assume H as a gamma distribution for ease of use and we need the values to be postive
+
+weighted average of your estimate and prior, pushing it to what you believe beforehand, it is a weighted matrix average which makes it slightly different
+
+
+
 
 

@@ -54,5 +54,11 @@ full.dyn.model <- dyn$lm(d.sub ~ d.sub.l +
                            p.sub.l)
 summary(full.dyn.model)
 # Restricted Model 1
+# ∆dt = α0 + β0∆et + γ0∆pt − (β0 + β1)(dt−1 − et−1) + ut
+ecm_part <- d.sub.l - e.sub.l
+restricted_ecm <- dyn$lm(diff(d.sub, 1, 1) ~ diff(e.sub, 1, 1) + diff(p.sub, 1, 1) + (e.sub.l - d.sub.l))
+summary(restricted_ecm)
 
+# Restricted Model 2
+# dt = α0 + α1 dt-1  β0et + α1B0et-1 γ0pt - α1γ0pt-1  + ut
 

@@ -8,6 +8,7 @@ library(car)
 library(xts)
 library(dyn)
 library(lubridate)
+library(urca)
 raw_data <- read_excel("../data/Shiller16.xlsx")
 
 # Because ND & NE have very notiecable trends we can 
@@ -53,11 +54,26 @@ summary(ur.df(na.omit(data.xts$R), type="none"))
 summary(ur.df(na.omit(data.xts$R), type="drift"))
 summary(ur.df(na.omit(data.xts$R), type="trend"))
 
-summary(ur.df(na.trim(data.xts$RL), type="none", lags=0))
-summary(ur.df(na.trim(data.xts$RL), type="drift", lags=0))
-summary(ur.df(na.trim(data.xts$RL), type="trend", lags=0))
+summary(ur.df(na.trim(data.xts$RL), type="none"))
+summary(ur.df(na.trim(data.xts$RL), type="drift"))
+summary(ur.df(na.trim(data.xts$RL), type="trend"))
 
 summary(ur.df(data.xts$RL, type="none", lags=1))
 summary(ur.df(na.trim(data.xts$RL - stats::lag(data.xts$RL, k=1)), type="drift", lags=0))
 summary(ur.df(na.trim(data.xts$RL), type="trend", lags=1))
 
+# R = Rt-1 + INFt-1 + RLt-1 + Rt-2 + INFt-2 + RLt-2
+# INF =Rt-1 + INFt-1 + RLt-1 + Rt-2 + INFt-2 + RLt-2 
+# RL = Rt-1 + INFt-1 + RLt-1 + Rt-2 + INFt-2 + RLt-2
+gc.lag <- 1
+grangertest(R ~ RL, data=data.xts, order = gc.lag)
+grangertest(R ~ INF, data=data.xts, order = gc.lag)
+grangertest(RL ~ R, data=data.xts, order = gc.lag)
+grangertest(RL ~ INF, data=data.xts, order = gc.lag)
+grangertest(INF ~ R, data=data.xts, order = gc.lag)
+grangertest(INF ~ RL, data=data.xts, order= gc.lag)
+
+#https://www.r-econometrics.com/timeseries/irf/
+var.model <- VAR(na.omit(data.xts), p=2, type=c("const"))
+feir <- irf(var.model, impulse = "R", response="RL", ortho = F, runs = 1000)
+plot(feir)
