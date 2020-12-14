@@ -77,3 +77,4 @@ grangertest(INF ~ RL, data=data.xts, order= gc.lag)
 var.model <- VAR(na.omit(data.xts), p=2, type=c("const"))
 feir <- irf(var.model, impulse = "R", response="RL", ortho = F, runs = 1000)
 plot(feir)
+
