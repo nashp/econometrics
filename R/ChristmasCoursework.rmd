@@ -1,0 +1,85 @@
+---
+title: "UK Macro History"
+author: "Peter Nash"
+date: "14 December 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(openxlsx)
+# import time-series packages and their libary of commands
+library(xts)
+library(tseries)
+library(dplyr)
+library(urca)
+# install.packages("dyn")
+library(dyn)
+library(xts)
+
+# import data (in CSV format)
+raw_data <- read.xlsx("../data/XMasCoursework.xlsx")
+
+full_data <- raw_data %>% dplyr::rename("YEAR" = "X1") %>%
+  mutate(LP = log(PGDP), LQ = log(Q), INF = 100 * (LP - lag(LP)), 
+         G = 100 * (LQ - lag(LQ)), YEAR = yearmon(YEAR)) %>% 
+  filter(YEAR <= 1985 , YEAR >= 1885)
+
+macro.series <- xts(full_data %>% select(-c(YEAR)), order.by = full_data$YEAR)
+macro.subset <- macro.series[, c("U", "G", "INF", "RS", "RL")]
+
+```
+
+## UK Macro Economic Relationships
+
+We look at a subset of the full series between 1885 and 1985 with the following variables
+ 
+* $U_t$: percent unemployment rate. Col ;
+* $P_t$ : PGDP: GDP deáator, 2013=100. 
+* Qt: real UK GDP at market prices, geographically consistent estimate
+based on post 1922 borders. £ mn Chained Volume measure, 2013 prices.
+Col A1.B.
+* $RS_t$: short interest rates, percent per annum, (Bank Rate). 
+* $RL_t$: long interest rates, percent per annum, (Consol/10 year debt) Col
+
+and their subsequent transformations
+
+* log GDP: $LQ_t$
+* log GDP deflator: $LPt$ 
+* inflation: $INFt = 100 ($LP_t$  $LP_{t-1}$)$; 
+* growth: $G_t = 100 (LQ_t  LQ_{t-1}$
+
+## Expected relationships
+
+We would expect to see cycles of growth, decreasing unemployment, potentially encouraged by easier monetary policy and lower short term interest rates. In due course this may subsequently lead to inflationary pressures as slack in the labour supply decreases and wages increase. Measures of control may increases in short term interest rates and subsequent cooling of economic growth. We would also expect inflationary pressures to lead to higher long term interest rates. We may see inflationary shocks or high periods of inflation leading to poor economic growth. 
+
+
+
+
+```{r}
+autoplot.zoo(macro.subset)
+```
+
+### Summary statistics
+
+```{r}
+summary(macro.subset)
+```
+
+Unemployment averages at 5% over the period with an average growth rate of 1.96%. The mean of inflation is 3.76% with the short and long term interest rates averaging at 4.8% and 5% respectively. We see peaks of inflation at 23% during the 1970s oil crisis (similar sustained periods of high inflation during WWI), unemployment at 15% following the great depression. Short term and long term interest rates show significant increases during the 1970s and onwards.
+
+```{r}
+cor(macro.subset)
+```
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
