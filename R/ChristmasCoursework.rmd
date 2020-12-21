@@ -13,20 +13,32 @@ library(xts)
 library(tseries)
 library(dplyr)
 library(urca)
-# install.packages("dyn")
+library(car)
 library(dyn)
 library(xts)
-
+library(lmtest)
 # import data (in CSV format)
 raw_data <- read.xlsx("../data/XMasCoursework.xlsx")
 
 full_data <- raw_data %>% dplyr::rename("YEAR" = "X1") %>%
   mutate(LP = log(PGDP), LQ = log(Q), INF = 100 * (LP - lag(LP)), 
          G = 100 * (LQ - lag(LQ)), YEAR = yearmon(YEAR)) %>% 
-  filter(YEAR <= 1985 , YEAR >= 1885)
+  filter(YEAR <= 1985 , YEAR >= 1885) %>% mutate(trend = seq(1, n()))
 
 macro.series <- xts(full_data %>% select(-c(YEAR)), order.by = full_data$YEAR)
 macro.subset <- macro.series[, c("U", "G", "INF", "RS", "RL")]
+
+ur.data <- cbind(macro.series$U, 
+                 stats::lag(macro.series$U, k=1), 
+                 stats::lag(macro.series$U, k=2), 
+                 macro.series$LQ,
+                 stats::lag(macro.series$LQ, k=1),
+                 stats::lag(macro.series$LQ, k=2),
+                 macro.series$trend
+                 )
+
+r.data <- cbind(ur.data$U - ur.data$U.1, ur.data$U.1 - ur.data$U.2, ur.data$LQ - ur.data$LQ.1)
+
 
 ```
 
@@ -60,7 +72,7 @@ We would expect to see cycles of growth, decreasing unemployment, potentially en
 autoplot.zoo(macro.subset)
 ```
 
-### Summary statistics
+### Summary Statistics & Commentary
 
 ```{r}
 summary(macro.subset)
@@ -73,13 +85,184 @@ cor(macro.subset)
 ```
 
 
+### Unrestricted Model
 
-## Including Plots
+We consider the unrestricted model $U_t = \alpha_0 + \alpha_1 U_{t-1} + \alpha_2 U_{t-2} + \beta_0 LQ_t + \beta_1 LQ_{t-1} + \beta_2 LQ_{t-2} + \gamma t + \epsilon_{1t}$
 
-You can also embed plots, for example:
+and observe the following
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+
+ur.ardl.model <- dyn$lm(U ~ stats::lag(U, k=1) + 
+                      stats::lag(U, k=2) + 
+                        LQ + 
+                      stats::lag(LQ, k=1) + 
+                      stats::lag(LQ, k=2) + trend, data = macro.series)
+
+summary(ur.ardl.model)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We note the coefficient of 1 period lagged unemployment, $\alpha_1 = 0.96$ , as individually significant, suggesting a 1% increase in lagged unemployment will lead to a 0.96% increase in the following period. We also note that the log GDP and lagged log GDP $LQ$ as significant, with a 1% increase in GDP proposing a -0.3% reduction in unemployment. However, we note that an increase in lagged GDP leading to a increase in unemployment, perhaps signalling some behaviour of the business cycle. The trend, $t$ nor 2 period lagged unemplpoyment, $U_{t-2}$ and 2 period lagged log GDP, $LQ_{t-1}$ are deemed to be significant. 
+
+
+```{r}
+plot(resid(ur.ardl.model))
+```
+
+
+We can observe potential heteroskedasticity in the residuals with greater variance in the early to mid 20th century and some notable outliers.
+
+### Diagnostic tests
+
+```{r}
+u <- resid(ur.ardl.model)
+durbinWatsonTest(as.vector(u))
+acf(u)
+```
+
+We note that DW is close to 2 (2.03) so no serial correlation. We can also observe this visually in the included ACF chart. The inclusion of two lagged terms appears to take care of any serial correlation concerns.
+
+We test for heteroskedasticity using
+$\hat u_t^{2} = \alpha + b'z_t + v_t$ using the hypothesis that $b' = 0$. In this case we use $z_t = x_t$
+
+```{r}
+u2 <- u * u
+summary(dyn$lm(u2 ~ stats::lag(U, k=1) + 
+                 stats::lag(U, k=2) + 
+                 LQ + 
+                 stats::lag(LQ, k=1) + 
+                 stats::lag(LQ, k=2) + trend, data = macro.series))$fstatistic
+```
+
+When we retrieve the F-statistic we see that this is 6.29 which  means we can reject the null hypothesis that $b' = 0$ and of homoskedasticity and constant variance. Given what we observe visually in the residuals with differing regimes throughough the sample, a further variance ratio test (Goldfeld-Quandt) might be warranted 
+
+Note, However, if we perform a reset test $\hat u_i = \alpha + b' \hat y_i^2 + \epsilon_i$ we observe different results and we fail to reject the null hypothesis of homoskedasticity
+
+```{r}
+yhat <- ur.ardl.model$fitted.values
+
+summary(lm(as.vector(u) ~ (yhat * yhat)))
+```
+
+Similarly another BPG test returns a p-value < 0.05 so we reject the null hypothesis of homoskedasticity. We can say our estimator is unbiased but not minimum variance and efficient. 
+
+```{r}
+bptest(ur.ardl.model)
+```
+
+Testing for normality using the Jarque Bera test we see a $\chi^2$ value of 380 and a p-value < 2.2e-16, so we reject the null hypothesis of normality.
+
+```{r}
+jarque.bera.test(u)
+```
+
+This implies our estimator is no longer the Maximum Likelihood estimator but is the minimum variance estimator in the class of linear unbiased estimators. 
+
+Performing a RESET test for functional form and non-linearity we see a p-value of > 0.05. We fail to reject the null hypothesis correct functional form and linearity. The RESET test takes the form of 
+$y_t  = \hat \beta_t x_t + \hat u_t$ then taking the residuals and $\hat u_t = b' x_t + c \hat y_t^2 + v_t$
+
+```{r}
+resettest(ur.ardl.model)
+```
+
+### Restricted Model
+
+We consider the model $\Delta U_t = \alpha_0 + \alpha_1 U_{t-1} + b_0 \Delta LQ_t + \epsilon_{2t}$
+
+```{r}
+r.data <- cbind(ur.data$U - ur.data$U.1, ur.data$U.1 - ur.data$U.2, ur.data$LQ - ur.data$LQ.1)
+
+r.model <- dyn$lm(U ~ U.1 + LQ, data = r.data)
+u <- resid(r.model)
+plot(u)
+summary(r.model)
+```
+
+Fitting the restricted model we see that a level change in log GDP is significant at the 1% level, the change in unemployment is not significant. Plotting the residuals we see similar issues with the post-war period showing a different, possibly more constant variance. We see the same issues around the interwar years with large outliers and higher variance. 
+
+Again we no serial correlation with a DW statistic of approximately 2 (2.05).
+
+```{r}
+durbinWatsonTest(as.vector(u))
+
+```
+
+Testing again for We test for heteroskedasticity using
+$\hat u_t^{2} = \alpha + b'z_t + v_t$ using the hypothesis that $b' = 0$. In this case we use $z_t = x_t$
+
+```{r}
+u2 <- u * u
+summary(dyn$lm(u2 ~  U.1 + LQ, data = r.data))$fstatistic
+```
+
+We see that the F-statstic is 9.5, suggesting the we fail to accept the null hypothesis of $b' = 0$ and of homoskedasticity. Similary a standalone BPG test shows we cannot accept the null hypothesis of constant variance
+
+```{r}
+bptest(r.model)
+```
+
+Testing for normality again we see that we fail to accept the null hypothesis of normality using the Jarque Bera Test
+
+```{r}
+jarque.bera.test(u)
+```
+
+Performing a RESET test to inform us on the functional form we see a RESET test statistic of 4.9 and a p-value of 0.009. We reject the null hyphothesis of non-linearity or correct functional form
+```{r}
+resettest(r.model)
+```
+
+Comparing the tests between the two models we see little difference bar the result of the RESET test which in the case of the restricted model fails for functional form. We observe heterskedasticity in both as well as non normality of the residuals. We do not observe any effects of serial correlation.
+
+Comparing the AIC & BIC tests we see that AIC & BIC prefers the restricted model marginally.
+```{r}
+data.frame(AIC(ur.ardl.model), AIC(r.model), BIC(ur.ardl.model), BIC(r.model))
+```
+
+Looking at the likelihood ratio test $2 (LL(\theta) - LL(\theta^{*}))$ we see 
+
+```{r}
+2 * (logLik(ur.ardl.model) - logLik(r.model))
+```
+
+We have 7 parameters in the unrestricted model and 3 parameters in the restricted so we have imposed 4 restrictions. We have restricted the following coefficients $\alpha_2 = (\alpha_1 - 1); \beta_1 = -\beta_0; \beta_2 = 0; \gamma = 0$ with the remaining coefficients unchanged. 
+
+Using the likelihood ratio test (which is $\chi^2 (4)$ distributed) we fail to reject the null hypothesis that the restrictions are not binding, or more simply we can not say the restrictions are binding.
+
+### ARIMA
+
+We test the following variables, $U_t$, $RL_t$  , $G_t$ and $INF_t$ for unit roots. Testing each for unit roots with and without trends we see the following
+
+* $U_t$: We fail to reject the null hypothesis that unemployment has a unit root and is of at least I(1)
+* $RL_t$: We fail to reject the null hypothesis that unemployment has a unit root and is of at least I(1)
+* $INF_t$: Inflation does not have a unit root
+* $G_t$: Growth does not have a unit root
+
+```{r}
+summary(ur.df(macro.series$INF)) 
+summary(ur.df(macro.series$G)) 
+summary(ur.df(macro.series$U))
+summary(ur.df(macro.series$U, type="trend"))
+summary(ur.df(macro.series$RL))
+summary(ur.df(macro.series$RL, type="trend"))
+
+```
+
+We estimate a random walk (using OLS) for inflation of the following form $y_t =\alpha  + y_{t-1} + \epsilon_t$
+
+```{r}
+rw.model <- dyn$lm(INF ~ stats::lag(INF, k=1), data=macro.series)
+summary(rw.model)
+```
+
+We estimate the random walk and the ARMA using Maximum Likelihood
+```{r}
+ma.model <- arima(macro.series[, "INF"], order = c(1, 0, 1), method="ML")
+rw.model <- arima(macro.series[, "INF"], order = c(1, 0, 0), method="ML")
+ma.model$aic
+rw.model$aic
+2 * (ma.model$loglik - rw.model$loglik)
+qchisq(0.025, df=1, lower.tail = F)
+```
+
+Using AIC we marginally choose the ARMA model over the random walk.
