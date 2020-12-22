@@ -132,7 +132,7 @@ durbinWatsonTest(model=as.vector(u_restricted))
 
 # Chisq is the Wald Test
 linearHypothesis(reg,c("sh_data$trend = 0","sh_data$LDlag + sh_data$LE + sh_data$LElag -1  = 0"),test="Chisq")
-linearHypothesis(reg,c("sh_data$trend = 0","sh_data$LDlag + sh_data$LE + sh_data$LElag -1  = 0"),test="F")
+linearHypothesis(reg,c("sh_data$trend = 0","sh_data$LDlag + sh_data$LE + sh_data$LElag -1  = 0"),test="F") # F is small sample
 
 # F Test
 R = matrix(c(0, 0, 0, 0, 1, 0, 1, 1, 1, 0), nrow=2, byrow = T)

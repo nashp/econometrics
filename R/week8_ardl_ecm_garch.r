@@ -58,9 +58,6 @@ summary(ur.df(na.trim(data.xts$RL), type="none"))
 summary(ur.df(na.trim(data.xts$RL), type="drift"))
 summary(ur.df(na.trim(data.xts$RL), type="trend"))
 
-summary(ur.df(data.xts$RL, type="none", lags=1))
-summary(ur.df(na.trim(data.xts$RL - stats::lag(data.xts$RL, k=1)), type="drift", lags=0))
-summary(ur.df(na.trim(data.xts$RL), type="trend", lags=1))
 
 # R = Rt-1 + INFt-1 + RLt-1 + Rt-2 + INFt-2 + RLt-2
 # INF =Rt-1 + INFt-1 + RLt-1 + Rt-2 + INFt-2 + RLt-2 

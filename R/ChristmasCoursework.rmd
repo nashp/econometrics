@@ -17,6 +17,7 @@ library(car)
 library(dyn)
 library(xts)
 library(lmtest)
+library(pander)
 # import data (in CSV format)
 raw_data <- read.xlsx("../data/XMasCoursework.xlsx")
 
@@ -48,7 +49,7 @@ We look at a subset of the full series between 1885 and 1985 with the following 
  
 * $U_t$: percent unemployment rate. Col ;
 * $P_t$ : PGDP: GDP deáator, 2013=100. 
-* Qt: real UK GDP at market prices, geographically consistent estimate
+* $Q_t$: real UK GDP at market prices, geographically consistent estimate
 based on post 1922 borders. £ mn Chained Volume measure, 2013 prices.
 Col A1.B.
 * $RS_t$: short interest rates, percent per annum, (Bank Rate). 
@@ -63,9 +64,7 @@ and their subsequent transformations
 
 ## Expected relationships
 
-We would expect to see cycles of growth, decreasing unemployment, potentially encouraged by easier monetary policy and lower short term interest rates. In due course this may subsequently lead to inflationary pressures as slack in the labour supply decreases and wages increase. Measures of control may increases in short term interest rates and subsequent cooling of economic growth. We would also expect inflationary pressures to lead to higher long term interest rates. We may see inflationary shocks or high periods of inflation leading to poor economic growth. 
-
-
+We would expect to see cycles of growth, decreasing unemployment, potentially encouraged by easier monetary policy and lower short term interest rates. In due course this may subsequently lead to inflationary pressures as slack in the labour supply decreases and wages increase. Monetary policy may induce increases in short term interest rates and subsequent cooling of economic growth. We would also expect inflationary pressures to lead to higher long term interest rates. We may see inflationary shocks or high periods of inflation leading to poor economic growth and higher unemployment. 
 
 
 ```{r}
@@ -78,12 +77,11 @@ autoplot.zoo(macro.subset)
 summary(macro.subset)
 ```
 
-Unemployment averages at 5% over the period with an average growth rate of 1.96%. The mean of inflation is 3.76% with the short and long term interest rates averaging at 4.8% and 5% respectively. We see peaks of inflation at 23% during the 1970s oil crisis (similar sustained periods of high inflation during WWI), unemployment at 15% following the great depression. Short term and long term interest rates show significant increases during the 1970s and onwards.
+Unemployment averages at 5% over the period with an average growth rate of 1.96%. The mean of inflation is 3.76% with the short and long term interest rates averaging at 4.8% and 5% respectively. We see peaks of inflation at 23% during the 1970s oil crisis, similar sustained periods of high inflation during WWI and unemployment at 15% following the great depression. Short term and long term interest rates show significant increases during the 1970s and onwards. 
 
 ```{r}
 cor(macro.subset)
 ```
-
 
 ### Unrestricted Model
 
@@ -99,7 +97,7 @@ ur.ardl.model <- dyn$lm(U ~ stats::lag(U, k=1) +
                       stats::lag(LQ, k=1) + 
                       stats::lag(LQ, k=2) + trend, data = macro.series)
 
-summary(ur.ardl.model)
+pander(summary(ur.ardl.model))
 ```
 
 We note the coefficient of 1 period lagged unemployment, $\alpha_1 = 0.96$ , as individually significant, suggesting a 1% increase in lagged unemployment will lead to a 0.96% increase in the following period. We also note that the log GDP and lagged log GDP $LQ$ as significant, with a 1% increase in GDP proposing a -0.3% reduction in unemployment. However, we note that an increase in lagged GDP leading to a increase in unemployment, perhaps signalling some behaviour of the business cycle. The trend, $t$ nor 2 period lagged unemplpoyment, $U_{t-2}$ and 2 period lagged log GDP, $LQ_{t-1}$ are deemed to be significant. 
@@ -116,7 +114,7 @@ We can observe potential heteroskedasticity in the residuals with greater varian
 
 ```{r}
 u <- resid(ur.ardl.model)
-durbinWatsonTest(as.vector(u))
+print(paste("DW:", durbinWatsonTest(as.vector(u))))
 acf(u)
 ```
 
@@ -141,7 +139,7 @@ Note, However, if we perform a reset test $\hat u_i = \alpha + b' \hat y_i^2 + \
 ```{r}
 yhat <- ur.ardl.model$fitted.values
 
-summary(lm(as.vector(u) ~ (yhat * yhat)))
+pandoc.table(summary(lm(as.vector(u) ~ (yhat * yhat))))
 ```
 
 Similarly another BPG test returns a p-value < 0.05 so we reject the null hypothesis of homoskedasticity. We can say our estimator is unbiased but not minimum variance and efficient. 
@@ -175,7 +173,7 @@ r.data <- cbind(ur.data$U - ur.data$U.1, ur.data$U.1 - ur.data$U.2, ur.data$LQ -
 r.model <- dyn$lm(U ~ U.1 + LQ, data = r.data)
 u <- resid(r.model)
 plot(u)
-summary(r.model)
+pandoc.table(summary(r.model))
 ```
 
 Fitting the restricted model we see that a level change in log GDP is significant at the 1% level, the change in unemployment is not significant. Plotting the residuals we see similar issues with the post-war period showing a different, possibly more constant variance. We see the same issues around the interwar years with large outliers and higher variance. 
@@ -223,11 +221,12 @@ Looking at the likelihood ratio test $2 (LL(\theta) - LL(\theta^{*}))$ we see
 
 ```{r}
 2 * (logLik(ur.ardl.model) - logLik(r.model))
+qchisq(p=0.05, df=4, lower.tail = F)
 ```
 
 We have 7 parameters in the unrestricted model and 3 parameters in the restricted so we have imposed 4 restrictions. We have restricted the following coefficients $\alpha_2 = (\alpha_1 - 1); \beta_1 = -\beta_0; \beta_2 = 0; \gamma = 0$ with the remaining coefficients unchanged. 
 
-Using the likelihood ratio test (which is $\chi^2 (4)$ distributed) we fail to reject the null hypothesis that the restrictions are not binding, or more simply we can not say the restrictions are binding.
+Using the likelihood ratio test (which is $\chi^2 (4)$ distributed) we fail to reject the null hypothesis that the restrictions are binding/true.
 
 ### ARIMA
 
@@ -239,8 +238,8 @@ We test the following variables, $U_t$, $RL_t$  , $G_t$ and $INF_t$ for unit roo
 * $G_t$: Growth does not have a unit root
 
 ```{r}
-summary(ur.df(macro.series$INF)) 
-summary(ur.df(macro.series$G)) 
+summary(ur.df(macro.series$INF))
+summary(ur.df(macro.series$G))
 summary(ur.df(macro.series$U))
 summary(ur.df(macro.series$U, type="trend"))
 summary(ur.df(macro.series$RL))
@@ -252,17 +251,19 @@ We estimate a random walk (using OLS) for inflation of the following form $y_t =
 
 ```{r}
 rw.model <- dyn$lm(INF ~ stats::lag(INF, k=1), data=macro.series)
-summary(rw.model)
+pandoc.table(summary(rw.model))
 ```
 
 We estimate the random walk and the ARMA using Maximum Likelihood
 ```{r}
 ma.model <- arima(macro.series[, "INF"], order = c(1, 0, 1), method="ML")
 rw.model <- arima(macro.series[, "INF"], order = c(1, 0, 0), method="ML")
+pandoc.table(summary(ma.model))
+pandoc.table(summary(rw.model))
 ma.model$aic
 rw.model$aic
 2 * (ma.model$loglik - rw.model$loglik)
-qchisq(0.025, df=1, lower.tail = F)
+qchisq(0.05, df=1, lower.tail = F)
 ```
 
-Using AIC we marginally choose the ARMA model over the random walk.
+THe AIC for the ARMA and Random Walk is 563 & 566 respectively so using AIC we marginally choose the ARMA model over the random walk. Using BIC we see they are almost identical, 574 and 574.2. 

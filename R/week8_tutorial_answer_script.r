@@ -43,7 +43,7 @@ test3 <- ur.df(lpe[77:129],type=c("drift"),lags=2)
 summary(test3)
 
 # Note: Need to exclude last to observations for 2015-16 which are missing.
-test4 <- ur.df(lpe[1:144],type=c("none"),lags=0) 
+test4 <- ur.df(lpe[1:144],type=c("drift"),lags=0) 
 summary(test4)
 
 test5 <- ur.df(lpe[1:144],type=c("drift"),lags=1) 

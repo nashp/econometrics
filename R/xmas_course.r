@@ -95,14 +95,44 @@ rw.model <- arima(macro.series[, "INF"], order = c(1, 0, 0), method="ML")
 
 
 
+# INF = INF_t-1 + U_t-1 + RL_t-1 + G_t-1
+# RL =  INF_t-1 + U_t-1 + RL_t-1 + G_t-1
+# U_t = INF_t-1 + U_t-1 + RL_t-1 + G_t-1
+# G_t = INF_t-1 + U_t-1 + RL_t-1 + G_t-1
+
+
+dyn$lm(INF ~ stats::lag(INF, k=1) + stats::lag(U, k=1) + 
+  stats::lag(RL, k=1) + stats::lag(G, k=1), macro.subset)
+
+dyn$lm(RL ~ stats::lag(INF, k=1) + stats::lag(U, k=1) + 
+         stats::lag(RL, k=1) + stats::lag(G, k=1), macro.subset)
+
+dyn$lm(U ~ stats::lag(INF, k=1) + stats::lag(U, k=1) + 
+         stats::lag(RL, k=1) + stats::lag(G, k=1), macro.subset)
+
+dyn$lm(G ~ stats::lag(INF, k=1) + stats::lag(U, k=1) + 
+         stats::lag(RL, k=1) + stats::lag(G, k=1), macro.subset)
 
 
 
+var.model <- VAR(na.omit(macro.subset[, c("U", "RL", "INF", "G")]), p=1, type=c("const"))
 
+gc.lag <- 1
+grangertest(U ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(U ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(U ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
+grangertest(G ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(G ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(G ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
+grangertest(INF ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(INF ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(INF ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
-
+grangertest(G ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(G ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(G ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
 
 
