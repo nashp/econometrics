@@ -117,9 +117,10 @@ dyn$lm(G ~ stats::lag(INF, k=1) + stats::lag(U, k=1) +
 
 var.model <- VAR(na.omit(macro.subset[, c("U", "RL", "INF", "G")]), p=1, type=c("const"))
 
+# The null hypothesis is that x does not Granger Cause y
 gc.lag <- 1
 grangertest(U ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
-grangertest(U ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(U ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag) #  p -value of .007
 grangertest(U ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
 grangertest(G ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
@@ -130,9 +131,34 @@ grangertest(INF ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.
 grangertest(INF ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 grangertest(INF ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
-grangertest(G ~ RL, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
-grangertest(G ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
-grangertest(G ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(RL ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(RL ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+grangertest(RL ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
 
+var1.model <- VAR(na.omit(macro.subset[, c("INF", "RL", "U", "G")]), p=2, type=c("const"))
+summ.var1 <- summary(var1.model)
+var1.feir <- irf(var1.model, impulse = "G", response="U", ortho = F, runs = 1000)
+var1.oir <- irf(var1.model, impulse = "G", response="U", ortho = T, runs = 1000)
+plot(var1.feir)
+plot(var1.oir)
+t(chol(summ.var1$covres))
 
+var2.model <- VAR(na.omit(macro.subset[, c("G", "INF", "U", "RL")]), p=1, type=c("const"))
+summ.var2 <- summary(var2.model)
+var2.feir <- irf(var2.model, impulse = "G", response="U", ortho = F, runs = 1000)
+var2.oir <- irf(var2.model, impulse = "G", response="U", ortho = F, runs = 1000)
+plot(var2.feir)
+plot(var2.oir)
+t(chol(summ.var2$covres))
 
+var3.model <- VAR(na.omit(macro.subset[, c("U", "G", "INF", "RL")]), p=1, type=c("const"))
+summ.var3 <- summary(var3.model)
+var3.feir <- irf(var3.model, impulse = "G", response="U", ortho = F, runs = 1000)
+var3.oir <- irf(var3.model, impulse = "G", response="U", ortho = F, runs = 1000)
+plot(var3.feir)
+plot(var3.oir)
+t(chol(summ.var3$covres))
+
+library(urca)
+jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="trace", K=2, ecdet="none", spec="longrun")
+summ.johansen <- summary(jo.test)

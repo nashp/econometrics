@@ -266,4 +266,39 @@ rw.model$aic
 qchisq(0.05, df=1, lower.tail = F)
 ```
 
-THe AIC for the ARMA and Random Walk is 563 & 566 respectively so using AIC we marginally choose the ARMA model over the random walk. Using BIC we see they are almost identical, 574 and 574.2. 
+THe AIC for the ARMA and Random Walk is 563 & 566 respectively so using AIC we marginally choose the ARMA model over the random walk. Using BIC we see they are almost identical, 574 and 574.2. Using a likelihood ratio test of $2 (LL(\theta) - LL(\hat \theta_r) )$
+
+### VAR
+
+We test a 4 variable VAR with $INF_t$, $RL_t$, $U_t$ and $G_t$. First we look at possible Granger Causality between the variables. We do not include all the GC tests in our results but we include those with the greatest significance. We can say reject the null hypothesis of no Granger Causality between 
+
+* inflation and unemployment, $INF_t$ and $U_t$. 
+* growth and unemployment, $G_t$ and $U_t$ (and vice versa)
+* interest rates and Unemployment
+* inflation and growth, $G_t$ is Granger causal of $INF_t$ is the most significant finding (F-stat = 13.3)
+
+```{r}
+grangertest(U ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
+grangertest(U ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
+grangertest(G ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
+grangertest(RL ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = gc.lag)
+
+grangertest(INF ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
+```
+
+Looking for cointegrating vectors using the Johansen test (trace) we see the following
+
+```{r}
+jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="trace", K=2, ecdet="none")
+summ.johansen <- summary(jo.test)
+print(summ.johansen)
+
+jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="eigen", K=2, ecdet="none")
+summ.johansen <- summary(jo.test)
+print(summ.johansen)
+
+```
+
+We reject the hypothesis of 0, and 1 co-integrating vectors. However, we can say there are at least 2 co-integrating vectors, maybe 3 co-integrating vectors as we fail to reject the test for r<=3 co-integrating vectors.
+
+
