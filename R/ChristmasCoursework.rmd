@@ -2,11 +2,15 @@
 title: "UK Macro History"
 author: "Peter Nash"
 date: "14 December 2020"
-output: pdf_document
+output: 
+  pdf_document: 
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
 ---
 
 ```{r setup, include=FALSE, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo =FALSE)
 library(openxlsx)
 # import time-series packages and their libary of commands
 library(xts)
@@ -19,6 +23,8 @@ library(xts)
 library(lmtest)
 library(pander)
 library(vars)
+library(ggplot2)
+library(forecast)
 # import data (in CSV format)
 raw_data <- read.xlsx("../data/XMasCoursework.xlsx")
 
@@ -27,7 +33,7 @@ full_data <- raw_data %>% dplyr::rename("YEAR" = "X1") %>%
          G = 100 * (LQ - lag(LQ)), YEAR = yearmon(YEAR)) %>% 
   filter(YEAR <= 1985 , YEAR >= 1885) %>% mutate(trend = seq(1, n()))
 
-macro.series <- xts(full_data %>% select(-c(YEAR)), order.by = full_data$YEAR)
+macro.series <- xts(full_data %>% dplyr::select(-c(YEAR)), order.by = full_data$YEAR)
 macro.subset <- macro.series[, c("U", "G", "INF", "RS", "RL")]
 
 ur.data <- cbind(macro.series$U, 
@@ -71,6 +77,7 @@ We would expect to see evidence of economic cycles throughought the period. This
 autoplot.zoo(macro.subset)
 ```
 
+## Step 1
 ### Summary Statistics & Commentary
 
 ```{r echo=FALSE}
@@ -84,12 +91,14 @@ Unemployment averages at 5% over the period with an average growth rate of 1.96%
 ```{r echo=FALSE}
 knitr::kable(cor(macro.subset), caption="Pearson Correlation Coefficients")
 ```
+\newpage
 
+## Step II
 ### Unrestricted Model
 
 We consider the unrestricted model $U_t = \alpha_0 + \alpha_1 U_{t-1} + \alpha_2 U_{t-2} + \beta_0 LQ_t + \beta_1 LQ_{t-1} + \beta_2 LQ_{t-2} + \gamma t + \epsilon_{1t}$
 
-and observe the following
+and observe the following regression results. 
 
 ```{r echo=FALSE}
 
@@ -102,25 +111,25 @@ ur.ardl.model <- dyn$lm(U ~ stats::lag(U, k=1) +
 pander(summary(ur.ardl.model))
 ```
 
-We note the coefficient of 1 period lagged unemployment, $\alpha_1 = 0.96$ , as individually significant, suggesting a 1% increase in lagged unemployment will lead to a 0.96% increase in the following period. We also note that the log GDP and lagged log GDP $LQ$ as significant, with a 1% increase in GDP proposing a -0.3% reduction in unemployment. However, we note that an increase in lagged GDP leading to a increase in unemployment, perhaps signalling some behaviour of the business cycle. The trend, $t$ nor 2 period lagged unemplpoyment, $U_{t-2}$ and 2 period lagged log GDP, $LQ_{t-1}$ are deemed to be significant. 
+We note the coefficient of 1 period lagged unemployment, $\alpha_1 = 0.96$ , as individually significant, suggesting a 1% increase in lagged unemployment will lead to a 0.96% increase in the following period. We also note that the log GDP and lagged log GDP $LQ$ as significant, with a 1% increase in GDP proposing a -0.3% reduction in unemployment. However, we note that an increase in lagged GDP leading to a increase in unemployment, perhaps signalling some behaviour of the business cycle. These estimates are significant at the 1% level.  The trend, $t$ nor 2 period lagged unemplpoyment, $U_{t-2}$ and 2 period lagged log GDP, $LQ_{t-1}$ are deemed to be significant. 
 
 
-```{r echo=FALSE}
-plot(resid(ur.ardl.model))
+```{r echo=FALSE, fig.cap="Residual Plot of Unrestricted ARDL model"}
+plot(resid(ur.ardl.model), main="Residual Plot of Unrestricted ARDL model")
 ```
 
 
-We can observe potential heteroskedasticity in the residuals with greater variance in the early to mid 20th century and some notable outliers.
+Observing the residuals of the model we note potential heteroskedasticity with greater variance in the early to mid 20th century and some notable outliers around historical events, WWI, The Great Depression and WWII. 
 
 ### Diagnostic tests
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="Autocorrelation of residuals"}
 u <- resid(ur.ardl.model)
 print(paste("DW:", round(durbinWatsonTest(as.vector(u)), 2)))
 plot(acf(u))
 ```
 
-We note that DW is close to 2 (2.03) so no serial correlation. We can also observe this visually in the included ACF chart. The inclusion of two lagged terms appears to take care of any serial correlation concerns.
+We note that DW is close to 2 (2.03) so no serial correlation. The test takes the form of $e_t = \rho e_t + v_t$ with a test statistic $\Sigma (e_t - e_{t-1})^2 / \Sigma (e_t^2)$ We can also observe this visually in the included ACF chart. The inclusion of two lagged terms appears to take care of any serial correlation concerns. 
 
 We test for heteroskedasticity using
 $\hat u_t^{2} = \alpha + b'z_t + v_t$ using the hypothesis that $b' = 0$. In this case we use $z_t = x_t$
@@ -138,57 +147,62 @@ knitr::kable(summary(dyn$lm(u2 ~ stats::lag(U, k=1) +
                  LQ + 
                  stats::lag(LQ, k=1) + 
                  stats::lag(LQ, k=2) + trend, data = macro.series))$fstatistic, caption="F-Statistic for the test for heteroskedasticity")
+
 ```
+\newpage
 
-When we retrieve the F-statistic we see that this is 10.8 which  means we can reject the null hypothesis that $b' = 0$ and of homoskedasticity and constant variance. Given what we observe visually in the residuals with differing regimes throughough the sample, a further variance ratio test (Goldfeld-Quandt) might be warranted 
+When we retrieve the F-statistic we see that this is 10.9 which  means we can reject the null hypothesis that $b' = 0$ and of homoskedasticity and constant variance. Given what we observe visually in the residuals with differing regimes throughough the sample, a further variance ratio test (Goldfeld-Quandt) might be warranted to test the different regimes.
 
-We also perform a RESET test of the form $\hat u_i^2 = \alpha + b \hat y_i^2 + \epsilon_i$. However in this case we can accept the null hypothesis that $b = 0$ and constant variance. However two of the three tests inform us of heteroskedasticity, perhaps giving us reason to investigate the result of this test 
+<!-- We also perform a RESET test of the form $\hat u_i^2 = \alpha + b \hat y_i^2 + \epsilon_i$. However in this case we can accept the null hypothesis that $b = 0$ and constant variance. However two of the three tests inform us of heteroskedasticity, perhaps giving us reason to investigate the result of this test -->
 
-```{r echo=FALSE}
-yhat <- ur.ardl.model$fitted.values
+<!-- ```{r echo=FALSE} -->
+<!-- yhat <- ur.ardl.model$fitted.values -->
 
-print(summary(lm(u2 ~ (yhat * yhat))))
-```
+<!-- print(summary(lm(u2 ~ (yhat * yhat)))) -->
+<!-- ``` -->
+Similarly another BP test using the *lmtest* package returns a p-value < 0.05 so we reject the null hypothesis of homoskedasticity. We can say our estimator is unbiased but not minimum variance and efficient. 
 
-Similarly another BPG test using the lmtest package returns a p-value < 0.05 so we reject the null hypothesis of homoskedasticity. We can say our estimator is unbiased but not minimum variance and efficient. 
-
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="BP Test"}
 print(bptest(ur.ardl.model))
 ```
 
-Testing for normality using the Jarque Bera test we see a $\chi^2$ value of 380 and a p-value < 2.2e-16, so we reject the null hypothesis of normality.
+Testing for normality using the Jarque Bera test, testing skewness and kurtosis, we see a $\chi^2$ value of 129 and a p-value < 2.2e-16, so we reject the null hypothesis of normality. 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="Jarque Bera Test on ARDL residuals"}
 print(jarque.bera.test(u))
 ```
 
-This implies our estimator is no longer the Maximum Likelihood estimator but is the minimum variance estimator in the class of linear unbiased estimators. 
+This implies our estimator is no longer the Maximum Likelihood estimator but does not impact our OLS estimator otherwise.  
 
-Performing a RESET test for functional form and non-linearity we see a p-value of > 0.05. We fail to reject the null hypothesis correct functional form and linearity. The RESET test takes the form of 
+Performing a RESET test for functional form and non-linearity we see a p-value of > 0.05. We fail to reject the null hypothesis of correct functional form and linearity. The RESET test takes the form of 
 $y_t  = \hat \beta_t x_t + \hat u_t$ then taking the residuals and $\hat u_t = b' x_t + c \hat y_t^2 + v_t$
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="Reset Test for Unrestricted ARDL Model"}
 print(resettest(ur.ardl.model))
 ```
+\newpage
 
+## Step III
 ### Restricted Model
 
 We consider the model $\Delta U_t = \alpha_0 + \alpha_1 U_{t-1} + b_0 \Delta LQ_t + \epsilon_{2t}$
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="Restricted Model Rediduals and Summary"}
 r.data <- cbind(ur.data$U - ur.data$U.1, ur.data$U.1 - ur.data$U.2, ur.data$LQ - ur.data$LQ.1)
 
 r.model <- dyn$lm(U ~ U.1 + LQ, data = r.data)
 u <- resid(r.model)
 plot(u, main="Residuls of Restricted Model")
-print(summary(r.model))
+pander(summary(r.model))
 ```
 
 Fitting the restricted model we see that a level change in log GDP is significant at the 1% level, the change in unemployment is not significant. Plotting the residuals we see similar issues with the post-war period showing a different, possibly more constant variance. We see the same issues around the interwar years with large outliers and higher variance. 
 
+### Diagnostic Tests
+
 Again we no serial correlation with a DW statistic of approximately 2 (2.05).
 
-```{r}
+```{r, echo=FALSE, fig.cap="DW for Restricted Model"}
 durbinWatsonTest(as.vector(u))
 
 ```
@@ -203,48 +217,188 @@ summary(dyn$lm(u2 ~  U.1 + LQ, data = r.data))$fstatistic
 
 We see that the F-statstic is 15.9, suggesting the we fail to accept the null hypothesis of $b' = 0$ and of homoskedasticity. Similary a standalone BPG test shows we cannot accept the null hypothesis of constant variance
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="BP Test for Homoskedasticity"}
 print(bptest(r.model))
 ```
 
 Testing for normality again we see that we do not accept the null hypothesis of normality using the Jarque Bera Test
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="Jarque Bera Test for Normality"}
 print(jarque.bera.test(u))
 ```
 
-Performing a RESET test to inform us on the functional form we see a RESET test statistic of 7.13 and a p-value of 0.001. We reject the null hyphothesis of non-linearity or correct functional form
+Performing a RESET test to inform us on the functional form we see a RESET test statistic of 7.13 and a p-value of 0.001. We reject the null hyphothesis of linearity or correct functional form
 ```{r echo=FALSE}
 print(resettest(r.model))
 ```
 
-Comparing the tests between the two models we see little difference bar the result of the RESET test which in the case of the restricted model fails for functional form. We observe heterskedasticity in both as well as non normality of the residuals. We do not observe any effects of serial correlation.
+### Restricted & Unrestricted Comparison
+Comparing the tests between the two models we see little difference bar the result of the RESET test which in the case of the restricted model fails for functional form. We note that the standard error of regression is less in the restricted model. We observe heterskedasticity in both as well as non normality of the residuals. We do not observe any effects of serial correlation in either.
 
 Comparing the AIC & BIC tests we see that AIC & BIC prefers the restricted model marginally.
 ```{r echo=FALSE}
-knitr::kable(data.frame(AIC(ur.ardl.model), AIC(r.model), BIC(ur.ardl.model), BIC(r.model)), caption = "AIC & BIC comparisons for unrestricted (ur) and restricted (r) models")
+knitr::kable(data.frame("AIC.Unres"=AIC(ur.ardl.model), "AIC.Rest"=AIC(r.model), "BIC.Unres"=BIC(ur.ardl.model),"BIC.Rest"=BIC(r.model)), caption = "AIC & BIC comparisons for unrestricted (ur) and restricted (r) models")
 ```
 
 Looking at the likelihood ratio test $2 (LL(\theta) - LL(\theta^{*}))$ we see 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="Likelihood Ratio"}
 print(paste("LR Test:",round(2 * (logLik(ur.ardl.model) - logLik(r.model)), 2)))
-print(paste("Chi Sq CV:", round(qchisq(p=0.05, df=4, lower.tail = F), 2)))
+print(paste("Chi Sq CV (5%):", round(qchisq(p=0.05, df=4, lower.tail = F), 2)))
 ```
 
-We have 7 parameters in the unrestricted model and 3 parameters in the restricted so we have imposed 4 restrictions. We have restricted the following coefficients $\alpha_2 = (\alpha_1 - 1); \beta_1 = -\beta_0; \beta_2 = 0; \gamma = 0$ with the remaining coefficients unchanged. 
+e have 7 parameters in the unrestricted model and 3 parameters in the restricted model so we have imposed 4 restrictions. We have restricted the following coefficients $\beta_2 = 0;\gamma = 0; \beta_1 = -\beta_0; \alpha_2 = -(\alpha_1 - 1)$. We reparameterise by setting $a_0 = \alpha_0; a_1 = (\alpha_1 - 1); b_0 = \beta_0$ 
 
 Using the likelihood ratio test (which is $\chi^2 (4)$ distributed) we fail to reject the null hypothesis that the restrictions are binding/true.
 
-### ARIMA
+```{r echo=FALSE, fig.cap="Fitted v Actual models"}
+autoplot.zoo(cbind(fitted(r.model), fitted(ur.ardl.model), macro.series[, "U"], (diff(macro.series[, "U"]))), facet=NULL)
+```
+\newpage
 
-We test the following variables, $U_t$, $RL_t$  , $G_t$ and $INF_t$ for unit roots. Testing each for unit roots with and without trends we see the following
+## Step IV
+### Univariate Models
+
+We test the following variables, $U_t$, $RL_t$, $G_t$ and $INF_t$ for unit roots. Testing each for unit roots with and without trends we see the following
 
 * $U_t$: We fail to reject the null hypothesis that unemployment has a unit root and is of at least I(1)
-* $RL_t$: We fail to reject the null hypothesis that unemployment has a unit root and is of at least I(1)
+* $RL_t$: We fail to reject the null hypothesis that the long term interest rate has a unit root and is of at least I(1)
 * $INF_t$: Inflation does not have a unit root
 * $G_t$: Growth does not have a unit root
 
+We estimate a random walk (using OLS) for inflation of the following form $y_t =\alpha  + y_{t-1} + \epsilon_t$
+
+```{r echo=FALSE, fig.cap="Regression Summary of Random Walk"}
+rw.model <- dyn$lm(INF ~ stats::lag(INF, k=1), data=macro.series)
+pander(summary(rw.model))
+```
+
+We estimate the random walk and the ARMA using Maximum Likelihood
+```{r echo=FALSE}
+ma.model <- arima(macro.series[, "INF"], order = c(1, 0, 1), method="ML")
+rw.model <- arima(macro.series[, "INF"], order = c(1, 0, 0), method="ML")
+pander(ma.model)
+pander(rw.model)
+knitr::kable(data.frame("MA.AIC"=ma.model$aic,"RW.AIC"=rw.model$aic, "LR"= 2 * (ma.model$loglik - rw.model$loglik), "Chi Sq"=qchisq(0.05, df=1, lower.tail = F)), caption="Moving Average (MA) /Random Walk (RW) Model comparison")
+```
+
+THe AIC for the ARMA and Random Walk is 563 & 566 respectively so using AIC we marginally choose the ARMA model over the random walk. Using BIC we see they are almost identical, 574 and 574.2. Using a likelihood ratio test of $2 (LL(\theta) - LL(\hat \theta_r) )$ we obtain a value of 4.75, which means we reject the null hypothesis at the 10% (cv = 3.84 $\chi^2(1)$) level but fail to reject at the 5% level (cv = 5.02 $\chi^2(1)$)
+
+```{r echo=FALSE, fig.cap="Fitted MA/RW versus actual"}
+autoplot.zoo(cbind(fitted(ma.model), fitted(rw.model), macro.series[, "INF"]), facet=NULL)
+```
+\newpage
+
+## Step V
+### VAR
+
+We fit a 4 variable VAR with $INF_t$, $RL_t$, $U_t$ and $G_t$. First we look at possible Granger Causality between the variables. We do not include all the GC tests in our results but we include those with the greatest significance. We can say reject the null hypothesis of no Granger Causality between 
+
+* inflation and unemployment, $INF_t$ and $U_t$ (Inflation is Granger Causaul of Unemployment)
+* growth and unemployment, $G_t$ and $U_t$ (and vice versa)
+* interest rates and Unemployment (Interest Rate Granger Causal of Unemployment)
+* inflation and growth, $G_t$ is Granger causal of $INF_t$ is the most significant finding (F-stat = 13.3)
+
+See the Appendix below for output of the relevent Granger Tests.
+
+Looking for cointegrating vectors using the Johansen test (trace) we see the following
+
+```{r, echo=FALSE, fig.cap="Johansen Test for Co-Integrating vectors"}
+jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="trace", K=2, ecdet="none")
+summ.johansen <- summary(jo.test)
+print(summ.johansen)
+
+jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="eigen", K=2, ecdet="none")
+summ.johansen <- summary(jo.test)
+print(summ.johansen)
+```
+
+We reject the hypothesis of 0, and 1 co-integrating vectors. However, we can say there are at least 2 co-integrating vectors, maybe 3 co-integrating vectors as we fail to reject the test for r<=3 co-integrating vectors.
+
+We estimate a p=1 order VAR, selecting based on AIC and with an intercept.
+
+```{r echo=FALSE}
+knitr::kable(VARselect(macro.subset[, c("INF", "RL", "U", "G")], type="const", lag.max = 5)$criteria, 
+             caption = "Selection Criteria for VAR Order")
+var.model <- VAR(macro.subset[, c("INF", "RL", "U", "G")], p=1, type=c("const"))
+covres <- summary(var.model)$covres
+corres <- summary(var.model)$corres
+knitr::kable(corres, caption="Correlation Matrix of VAR residuals")
+knitr::kable(t(chol(covres)), caption = "Cholesky Decomposition of Covariance Matrix of Residuals")
+```
+
+Noting the Cholesky decomposition of the covariance matrix of residuals we can see there is no contemporaneous relationship between growth, $G$ and other variables bar itself. We note a contemporaneous relationship between long term interest rates $RL$ and uneployment, $U$ and Growth $G$. We plot the orthogonal impulse response to shocks in growth and interest rates below. There is some consistency here between the Granger Causality tests referenced above.
+
+```{r echo=FALSE, fig.cap="Orthogonal Impulse Response of Interest Rates"}
+#var.feir <- irf(var.model, impulse = c("G", "RL"), ortho = F, runs = 1000)
+var.oir <- irf(var.model, impulse = c("RL"), ortho = T, runs = 1000)
+#plot(var.feir)
+plot(var.oir)
+```
+
+```{r echo=FALSE, fig.cap="Orthogonal Impulse Response of Growth"}
+#var.feir <- irf(var.model, impulse = c("G", "RL"), ortho = F, runs = 1000)
+var.oir <- irf(var.model, impulse = c("G"), ortho = T, runs = 1000)
+#plot(var.feir)
+plot(var.oir)
+```
+
+
+Looking at growth first we note the impact on inflation in subsequent periods, similarly we note an inverse impact on unemployment following an impulses to growth. This remains true within the 95% confidence interval. This supports the theory of strong growth leading to lower unemployment and higher inflation. Looking at the impulse response from RL we see an impact on longer term inflation and unemployment and a contemporaneous impact on growth. However, there is more uncertainty around these statements given the wide confidence intervals. 
+
+\newpage
+
+## Step VI
+### Instrumental Variables
+
+We perform a two stage least squares, first regressing the exogenous instruments, $INF_{t-1}$, $U_{t-1}$, $G_{t-1}$ and $RL_{t-1}$ on the endogenous variables $U_t$ and $INF_{t-1}$.  The system is over identified with two parameters and four instrumental variable. The results of this regression are presented below. Looking at the results we cannot say they fail the test for weak instruments as the F-statistic, testing for joint significance shows 129 in model 1 (uneployment) and 43 in model 2 (inflation) ($F(4, 95)$ at 1% ~ 4). However, we can say that in reduced form uneployment model we only see lagged unemployment and growth as individually significant. In the lagged inflation reduced form equation we can say that lagged growth, unemployment and interest rates are individually significant. 
+
+
+```{r echo=FALSE}
+X = macro.series[, "U"]
+W = cbind(stats::lag(macro.series[, c("INF", "U", "G", "RL")]))
+s1.data <- cbind(X,W)
+u.model <- dyn$lm(U ~ INF + U.1 + G + RL, data=s1.data)
+u.resid <- resid(u.model)
+if.model <- dyn$lm(INF ~ INF + U.1 + G + RL, data=s1.data)
+if.resid <- resid(if.model)
+pander(summary(u.model))
+pander(summary(if.model))
+W <- na.omit(W)
+#autoplot.zoo(cbind(u.model$fitted.values, W[,"U"]))
+#autoplot.zoo(cbind(if.model$fitted.values, W[,"INF"]))
+```
+
+We perform a second stage regression on $INF_t$ with $\hat U_t$ and $\hat INF_{t-1}$.
+
+```{r echo=FALSE, fig.cap="Stage II Errors"}
+xhat <- xts(cbind(u.model$fitted.values, if.model$fitted.values), order.by =index(W))
+colnames(xhat) <- c("Uhat", "INFhat")
+s2.model <- dyn$lm(INF ~ Uhat + INFhat, data=cbind(xhat, macro.series[, "INF"]))
+pander(summary(s2.model))
+intercept <- coef(s2.model)[1]
+coefs <- coef(s2.model)[2:3]
+uhat <- macro.series[, "INF"] - (rep(intercept, nrow(macro.series)) + coefs[1] * macro.series[, "U"] + coefs[2] * stats::lag(macro.series[, "INF"], k=1))
+#autoplot.zoo(cbind(s2.model$fitted.values, W[, "INF"]), facets = NULL)
+autoplot.zoo(uhat) + ylab("Stage II Errors") + xlab("Date")
+```
+
+
+<!-- # ```{r echo=FALSE} -->
+<!-- # wu.test <- dyn$lm(INF ~ U + stats::lag(INF, k=1) + u.resid + if.resid, data=macro.series) -->
+<!-- # base.model <- dyn$lm(INF ~ U + stats::lag(INF, k=1), data=macro.series) -->
+<!-- # lrtest <- 2* (logLik(wu.test) - logLik(base.model)) -->
+<!-- # print(lrtest) -->
+<!-- # qchisq(0.05, df=2, lower.tail = F) -->
+<!-- # ``` -->
+We perform a Wu-Hausmann test of the form $INF_t =\beta_0 + \beta_1 U_t + \beta_2 INF_{t-1} + \delta_1 \hat v_{1t} + \delta_2 \hat v_{2t}$ testing a null hypothesis of exogoneity s.t. $H_0: \delta_1 = \delta_2 = 0$. Looking at a likelihood ratio test we get a test-statistic of 18.7 (CV ~ 7), so we reject the restrictions (of exogoneity of both parameters). If we look at unemployemnt individually we see that we can clearly reject the null hypothesis of $\delta_1 = 0$ and of exogeneity. We can accept the assumption of endogeneity. However, looking at $INF_{t-1}$, we fail to reject that this is exogenous.
+
+\newpage
+
+# Appendix
+
+## ARIMA
+### ADF 
 ```{r echo=FALSE}
 summary(ur.df(macro.series$INF))
 summary(ur.df(macro.series$G))
@@ -254,55 +408,19 @@ summary(ur.df(macro.series$RL))
 summary(ur.df(macro.series$RL, type="trend"))
 ```
 
-We estimate a random walk (using OLS) for inflation of the following form $y_t =\alpha  + y_{t-1} + \epsilon_t$
+## VAR
 
+### VAR Model
 ```{r echo=FALSE}
-rw.model <- dyn$lm(INF ~ stats::lag(INF, k=1), data=macro.series)
-print(summary(rw.model))
+pander(summary(var.model))
 ```
 
-We estimate the random walk and the ARMA using Maximum Likelihood
+### Granger Causality 
+
 ```{r echo=FALSE}
-ma.model <- arima(macro.series[, "INF"], order = c(1, 0, 1), method="ML")
-rw.model <- arima(macro.series[, "INF"], order = c(1, 0, 0), method="ML")
-print(ma.model)
-print(rw.model)
-knitr::kable(data.frame("MA.AIC"=ma.model$aic,"RW.AIC"=rw.model$aic, "LR"= 2 * (ma.model$loglik - rw.model$loglik), "Chi Sq"=qchisq(0.05, df=1, lower.tail = F)), caption="Moving Average (MA) /Random Walk (RW) Model comparison")
-```
-
-THe AIC for the ARMA and Random Walk is 563 & 566 respectively so using AIC we marginally choose the ARMA model over the random walk. Using BIC we see they are almost identical, 574 and 574.2. Using a likelihood ratio test of $2 (LL(\theta) - LL(\hat \theta_r) )$ we obtain a value of 4.75, which means we reject the null hypothesis at the 10% (cv = 3.84 $\chi^2(1)$) level but fail to reject at the 5% level (cv = 5.02 $\chi^2(1)$)
-
-### VAR
-
-We test a 4 variable VAR with $INF_t$, $RL_t$, $U_t$ and $G_t$. First we look at possible Granger Causality between the variables. We do not include all the GC tests in our results but we include those with the greatest significance. We can say reject the null hypothesis of no Granger Causality between 
-
-* inflation and unemployment, $INF_t$ and $U_t$. 
-* growth and unemployment, $G_t$ and $U_t$ (and vice versa)
-* interest rates and Unemployment
-* inflation and growth, $G_t$ is Granger causal of $INF_t$ is the most significant finding (F-stat = 13.3)
-
-```{r}
 grangertest(U ~ INF, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
 grangertest(U ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
 grangertest(G ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
 grangertest(RL ~ U, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
 grangertest(INF ~ G, data=macro.subset[, c("U", "RL", "INF", "G")], order = 1)
 ```
-
-Looking for cointegrating vectors using the Johansen test (trace) we see the following
-
-```{r}
-jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="trace", K=2, ecdet="none")
-summ.johansen <- summary(jo.test)
-print(summ.johansen)
-
-jo.test <- ca.jo(na.omit(macro.subset[, c("U", "G", "INF", "RL")]),type="eigen", K=2, ecdet="none")
-summ.johansen <- summary(jo.test)
-print(summ.johansen)
-
-```
-
-We reject the hypothesis of 0, and 1 co-integrating vectors. However, we can say there are at least 2 co-integrating vectors, maybe 3 co-integrating vectors as we fail to reject the test for r<=3 co-integrating vectors.
-
-
-
