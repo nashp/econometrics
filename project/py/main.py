@@ -28,19 +28,7 @@ from future import GenericFuture
 # Coffee KC
 
 
-quandl.ApiConfig.api_key = 'Z2WYzGME3qmxnqQgBcdX'
 
-co_tickers = ["ICE_B", "CME_BK", "CME_W", "CME_C",
-                 "CME_HG", "MCX_PB", "CME_ALI", "CME_NG",
-                 "CME_LN", "ICE_KC", "ICE_CT", "ICE_CC", "ICE_SB",
-                 "CME_HO", "CME_RB"]
-
-co_meta_data_path = "../../data/CHRIS_metadata.csv"
-
-co_meta_data = pd.read_csv(co_meta_data_path)
-
-first_f = pd.DataFrame()
-second_f = pd.DataFrame()
 
 n_contracts = 12
 
