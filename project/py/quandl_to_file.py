@@ -26,22 +26,36 @@ co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
               "CAD": "CME_CD", "UST5": "CME_FV", "UST2": "CME_TU", "UST10": "CME_TY",
               "FedFunds": "CME_FF"}
 
+contract_months = {"F": "Jan", "G": "Feb", "H":"March",
+                   "J":"Apr", "K":"May", "M":"Jun", "N": "Jul", "Q": "Aug",
+                   "U":"Sept",  "V":"Oct", "X":"Nov", "Z":"Dec"}
+
 co_meta_data_path = "../../data/CHRIS_metadata.csv"
+co_contract_data_path = "../../data/CHRIS_contractdata.csv"
 
 co_meta_data = pd.read_csv(co_meta_data_path)
+co_contract_data = pd.read_csv(co_meta_data, header=True)
 
-mask = co_meta_data["code"].str.contains('|'.join(co_tickers))
+mask = co_meta_data["code"].str.contains('|'.join(co_tickers.values()))
 quandl_codes = co_meta_data[mask]["code"]
 quandl_codes = "CHRIS/" + quandl_codes
 
 n = len(quandl_codes)
 price_data = n * [None]
 volume_data = n * [None]
+open_interest_data = n * [None]
 for i in range(n):
     try:
         data = quandl.get(quandl_codes.iloc[i])
         try:
-            volume_data[i] = data["Volume"].rename(quandl_codes.iloc[i])
+            volume_data[i] = data["Volume"].rename(quandl_codes.iloc[i].replace("CHRIS/", ""))
+            #volume_data.append(volume)
+        except Exception as e:
+            print(e)
+            pass
+
+        try:
+            open_interest_data[i] = data["Previous Day Open Interest"].rename(quandl_codes.iloc[i].replace("CHRIS/", ""))
             #volume_data.append(volume)
         except Exception as e:
             print(e)
@@ -51,20 +65,19 @@ for i in range(n):
             price_col = "Settle"
         else:
             price_col = "Close"
-        price_data[i] = data[price_col].rename(quandl_codes.iloc[i])
+        price_data[i] = data[price_col].rename(quandl_codes.iloc[i].replace("CHRIS/", ""))
     except Exception as e:
         print("Error in: " + quandl_codes.iloc[i] + "With exception: " + e)
         pass
 
 price_data = pd.concat(price_data, axis=1)
 volume_data = pd.concat(volume_data, axis=1)
+open_interest_data = pd.concat(open_interest_data, axis=1)
 
 with pd.ExcelWriter('output.xlsx') as writer:
     price_data.to_excel(writer, sheet_name="Settle")
     volume_data.to_excel(writer, sheet_name="Volume")
-
-first_f = pd.DataFrame()
-second_f = pd.DataFrame()
+    open_interest_data.to_excel(writer, sheet_name="OpenInterest")
 
 def get_quandl_data(tickers):
 

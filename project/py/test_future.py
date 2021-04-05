@@ -43,7 +43,6 @@ class TestGenericFuture(TestCase):
             future.clean_data()
 
             if future.missing_count() == 0:
-
                 self.fail()
 
             print("Missing Data: " + str(future.missing_count()))
@@ -56,3 +55,43 @@ class TestGenericFuture(TestCase):
     def test_monthly(self):
         self.fail()
 
+    def test_calculate_return(self):
+        self.load_data()
+        try:
+            future = GenericFuture(ticker="B", number=1)
+            tickers = self.data.columns[1:]
+            data = self.data.iloc[:, 0]
+            ticker = tickers[1]
+            number = 1
+
+            future = GenericFuture(ticker=ticker, number=number, data=data)
+            future.clean_data()
+            future.to_monthly()
+            future.calculate_return()
+            future.returns().plot()
+
+            plt.show()
+
+        except Exception as e:
+            self.fail()
+
+    def test_cumulative_return(self):
+        self.load_data()
+        try:
+            future = GenericFuture(ticker="B", number=1)
+            tickers = self.data.columns[1:]
+            data = self.data.iloc[:, 0]
+            ticker = tickers[1]
+            number = 1
+
+            future = GenericFuture(ticker=ticker, number=number, data=data)
+            future.clean_data()
+            future.to_monthly()
+            future.calculate_return()
+            future.calculate_cumulative_return()
+            future.returns().plot()
+            future.cumulative_return().plot()
+            plt.show()
+
+        except Exception as e:
+            self.fail()

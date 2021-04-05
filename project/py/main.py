@@ -33,6 +33,15 @@ from future import GenericFuture
 n_contracts = 12
 
 futures = {}
+co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
+              "Corn": "CME_C", "Copper": "CME_HG", "Lead": "MCX_PB",
+              "Aluminium": "CME_ALI", "Gas": "CME_NG", "Hogs": "CME_LN",
+              "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
+              "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
+              "Lumber": "CME_LB", "NaturalGas": "CME_NG", "Gold": "CME_GC",
+              "Platinum": "CME_PL", "AUD": "CME_AD", "ZAR": "CME_RA", "NOK": "CME_NJ",
+              "CAD": "CME_CD", "UST5": "CME_FV", "UST2": "CME_TU", "UST10": "CME_TY",
+              "FedFunds": "CME_FF"}
 
 for ticker in co_tickers:
 

@@ -13,6 +13,8 @@ class GenericFuture(object):
         self._monthly = None
         self._daily = None
         self._is_monthly = False
+        self._returns = None
+        self._cumulative_return = None
         self._number = number
 
     def fill_data(self, data):
@@ -53,6 +55,24 @@ class GenericFuture(object):
             self._series = self._daily
             self._is_monthly = False
         return self._series
+
+    def calculate_return(self):
+        self._returns = self._series.pct_change()
+
+    def returns(self):
+        if self._returns is None:
+            self.calculate_return()
+        return self._returns
+
+    def calculate_cumulative_return(self):
+        if self._returns is None:
+            self.calculate_return()
+
+        self._cumulative_return = self._returns.add(1).cumprod() - 1
+        return self._cumulative_return
+
+    def cumulative_return(self):
+        return self._cumulative_return
 
     def plot(self):
         if self._series is not None:
