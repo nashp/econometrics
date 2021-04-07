@@ -69,7 +69,7 @@ co_contract_data_path = "../data/CHRIS_contractdata.csv"
 co_meta_data = pd.read_csv(co_meta_data_path)
 co_contract_data = pd.read_csv(co_contract_data_path).rename(columns={"Quandl Code": "QuandlCode"})
 
-mask = co_meta_data["code"].str.contains("CME_CL[1-3]$")
+mask = co_meta_data["code"].str.contains("CME_C[1-3]$")
 quandl_codes = "CHRIS/" + co_meta_data[mask]["code"]
 
 ust = quandl.get("USTREASURY/YIELD", start="1990-01-01")

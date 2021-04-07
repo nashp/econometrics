@@ -91,4 +91,7 @@ mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
 months = co_contract_data[mask]["Months"]
 df["IsDeliveryMonth"] =  df["ContractMonth"].apply(lambda x: months.str.contains(x))
 df.groupby(by=["YearMon", "IsDeliveryMonth"])["Date"].first()
+first_dates = df.groupby(by=["YearMon", "IsDeliveryMonth"], as_index=False)["Date"].first()
+df = df.merge(first_dates[["YearMon", "Date"]], how="left", on="YearMon")
+
 #contracts.to_excel("ContractComparison.xlsx")
