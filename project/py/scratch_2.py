@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import quandl
+import datetime as dt
 
 quandl.ApiConfig.api_key = 'Z2WYzGME3qmxnqQgBcdX'
 
@@ -89,9 +90,41 @@ df["YearMon"] = df["Date"].transform(lambda x: x.strftime("%y-%m"))
 df["ContractMonth"] = df["Month"].apply(lambda x: contract_months[x])
 mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
 months = co_contract_data[mask]["Months"]
-df["IsDeliveryMonth"] =  df["ContractMonth"].apply(lambda x: months.str.contains(x))
+df["IsDeliveryMonth"] = df["ContractMonth"].apply(lambda x: months.str.contains(x))
 df.groupby(by=["YearMon", "IsDeliveryMonth"])["Date"].first()
 first_dates = df.groupby(by=["YearMon", "IsDeliveryMonth"], as_index=False)["Date"].first()
-df = df.merge(first_dates[["YearMon", "Date"]], how="left", on="YearMon")
+first_dates = first_dates.rename(columns={"Date": "Expiry"})
+first_dates["1C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-1)
+first_dates["2C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-2)
+first_dates["3C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-3)
+first_dates["4C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-4)
+first_dates["5C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-5)
+first_dates["6C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-6)
 
-#contracts.to_excel("ContractComparison.xlsx")
+
+output = df.merge(first_dates[["YearMon", "Expiry", "1C", "2C", "3C", "4C", "5C", "6C"]], how="left", on="YearMon")
+output.loc[~df["IsDeliveryMonth"], "Expiry"] = np.NaN
+
+output.to_excel("CornContract.xlsx")
+
+dates = pd.DataFrame(pd.bdate_range(start=df["Date"].min(), end=df["Date"].max() + dt.timedelta(days=720)),
+                  columns=["Date"])
+dates["Month"] = dates["Date"].transform(lambda x: x.strftime("%b"))
+dates["YearMon"] = dates["Date"].transform(lambda x: x.strftime("%y-%m"))
+dates["ContractMonth"] = dates["Month"].apply(lambda x: contract_months[x])
+mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
+months = co_contract_data[mask]["Months"]
+dates["IsDeliveryMonth"] = dates["ContractMonth"].apply(lambda x: months.str.contains(x))
+first_dates = dates.groupby(by=["YearMon", "IsDeliveryMonth"], as_index=False)["Date"].first()
+first_dates = first_dates.rename(columns={"Date": "Expiry"})
+first_dates["1C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-1)
+first_dates["2C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-2)
+first_dates["3C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-3)
+first_dates["4C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-4)
+first_dates["5C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-5)
+first_dates["6C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-6)
+
+output = dates.merge(first_dates[["YearMon", "Expiry", "1C", "2C", "3C", "4C", "5C", "6C"]], how="left", on="YearMon")
+output.loc[~dates["IsDeliveryMonth"], "Expiry"] = np.NaN
+
+output.to_excel("CornContract.xlsx")
