@@ -82,7 +82,8 @@ adj_ff = adjust_continuous_future(near_ticker=quandl_codes.iloc[1], far_ticker=q
                                   start_date="1990-01-01", end_date="2021-03-31")
 
 near_ticker = quandl_codes.iloc[0]
-df = quandl.get(near_ticker, start_date="2000-01-01")
+raw_data = quandl.get(near_ticker, start_date="2000-01-01")
+df = raw_data.copy()
 df["QuandlCode"] = "CHRIS/" + root_ticker
 df = pd.merge(df.reset_index(), co_contract_data, on="QuandlCode", how="left")
 df["Month"] = df["Date"].transform(lambda x: x.strftime("%b"))
@@ -90,8 +91,14 @@ df["YearMon"] = df["Date"].transform(lambda x: x.strftime("%y-%m"))
 df["ContractMonth"] = df["Month"].apply(lambda x: contract_months[x])
 mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
 months = co_contract_data[mask]["Months"]
+df = df.rename(columns={"Previous Day Open Interest": "OI"})
+df["OI"] = df["OI"].shift(-1)
 df["IsDeliveryMonth"] = df["ContractMonth"].apply(lambda x: months.str.contains(x))
 df.groupby(by=["YearMon", "IsDeliveryMonth"])["Date"].first()
+df = df.merge(df.groupby("YearMon", as_index=False)["OI"].min(), on="YearMon", how="left")
+mask = (df["OI_x"] == df["OI_y"]) & (df["IsDeliveryMonth"])
+expiry_day = df.loc[mask, "Date"].dt.day.mode()
+
 first_dates = df.groupby(by=["YearMon", "IsDeliveryMonth"], as_index=False)["Date"].first()
 first_dates = first_dates.rename(columns={"Date": "Expiry"})
 first_dates["1C"] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-1)
@@ -128,3 +135,39 @@ output = dates.merge(first_dates[["YearMon", "Expiry", "1C", "2C", "3C", "4C", "
 output.loc[~dates["IsDeliveryMonth"], "Expiry"] = np.NaN
 
 output.to_excel("CornContract.xlsx")
+
+
+def generate_contract_expiries(ff_open_interest, root_ticker, co_contract_data, generic_contract_months, n_contracts=3):
+    ff_open_interest["Month"] = ff_open_interest["Date"].transform(lambda x: x.strftime("%b"))
+    ff_open_interest["YearMon"] = ff_open_interest["Date"].transform(lambda x: x.strftime("%y-%m"))
+    ff_open_interest["ContractMonth"] = ff_open_interest["Month"].apply(lambda x: generic_contract_months[x])
+    mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
+    months = co_contract_data[mask]["Months"]
+    ff_open_interest = ff_open_interest.rename(columns={"Previous Day Open Interest": "OI"})
+    ff_open_interest["OI"] = ff_open_interest["OI"].shift(-1)
+    ff_open_interest["IsDeliveryMonth"] = ff_open_interest["ContractMonth"].apply(lambda x: months.str.contains(x))
+    ff_open_interest = ff_open_interest.merge(ff_open_interest.groupby("YearMon", as_index=False)["OI"].min(),
+                                              on="YearMon",
+                                              how="left")
+    mask = (ff_open_interest["OI_x"] == ff_open_interest["OI_y"]) & (ff_open_interest["IsDeliveryMonth"])
+    expiry_day = ff_open_interest.loc[mask, "Date"].dt.day.mode()
+
+    dates = pd.DataFrame(pd.bdate_range(start=ff_open_interest["Date"].min(),
+                                        end=ff_open_interest["Date"].max() + dt.timedelta(days=720)),
+                         columns=["Date"])
+    dates["Month"] = dates["Date"].transform(lambda x: x.strftime("%b"))
+    dates["YearMon"] = dates["Date"].transform(lambda x: x.strftime("%y-%m"))
+    dates["ContractMonth"] = dates["Month"].apply(lambda x: contract_months[x])
+    mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
+    months = co_contract_data[mask]["Months"]
+    dates["IsDeliveryMonth"] = dates["ContractMonth"].apply(lambda x: months.str.contains(x))
+    first_dates = dates.groupby(by=["YearMon", "IsDeliveryMonth"], as_index=False)["Date"].first()
+    first_dates = first_dates.rename(columns={"Date": "Expiry"})
+
+    for i in range(n_contracts):
+        col_name = str(i) + "C_Expiry"
+        first_dates[col_name] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-i) + \
+                                dt.timedelta(days=expiry_day)
+
+    dates.merge(first_dates, how="left", on="YearMon")
+    return dates
