@@ -26,7 +26,7 @@ contract_data = pd.read_csv("../data/CHRIS_contractdata.csv")
 #               "ICE_KC": "Coffee", "ICE_CT": "Cotton", "ICE_CC": "Cocoa",
 #               "ICE_SB": "Sugar", "CME_HO": "HeatOil", "CME_RB": "Gasoline"}
 
-co_tickers = {"Brent": "ICE_B", "WTI": "CME_BK", "Wheat": "CME_W",
+co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
               "Corn": "CME_C", "Copper": "CME_HG", "Lead": "MCX_PB",
               "Aluminium": "CME_ALI", "Gas": "CME_NG", "Hogs": "CME_LN",
               "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",

@@ -39,8 +39,10 @@ def generate_contract_expiries(ff_open_interest, root_ticker, co_contract_data, 
         col_name = str(1+i) + "C_Expiry"
         first_dates[col_name] = first_dates[first_dates["IsDeliveryMonth"]]["Expiry"].shift(-i) + \
                                 dt.timedelta(days=int(expiry_day))
-        #first_dates["IsWeekend"] = first_dates[col_name].transform(lambda x: x.weekday()) >= 5
-        #first_dates.loc[first_dates["IsWeekend"], "Expiry"] = first_dates.loc[first_dates["IsWeekend"], "Expiry"].transform(lambda x: x - (x-5))
+        first_dates["IsWeekend"] = first_dates[col_name].transform(lambda x: x.isoweekday()) > 5
+        first_dates.loc[first_dates["IsWeekend"],
+                        col_name] = first_dates.loc[first_dates["IsWeekend"],
+                                                    col_name].transform(lambda x: x - dt.timedelta(days=(x.isoweekday() - 5)))
         first_dates[col_name] = first_dates[col_name].bfill()
 
     dates = dates.merge(first_dates, how="left", on="YearMon")
@@ -68,7 +70,8 @@ co_contract_data_path = "../data/CHRIS_contractdata.csv"
 co_meta_data = pd.read_csv(co_meta_data_path)
 co_contract_data = pd.read_csv(co_contract_data_path).rename(columns={"Quandl Code": "QuandlCode"})
 
-root_ticker = "CME_C"
+commodity = "Lumber"
+root_ticker = co_tickers[commodity]
 mask = co_meta_data["code"].str.contains(root_ticker + "[1-3]$")
 quandl_codes = "CHRIS/" + co_meta_data[mask]["code"]
 
@@ -80,4 +83,4 @@ expiries = generate_contract_expiries(raw_data["Previous Day Open Interest"].cop
                                       root_ticker=root_ticker, co_contract_data=co_contract_data,
                                       generic_contract_months=contract_months, n_contracts=3)
 
-expiries.to_excel("CornContractExpiries.xlsx")
+expiries.to_excel(commodity + "ContractExpiries.xlsx")
