@@ -118,7 +118,7 @@ class TestGenericFuture(TestCase):
             co_contract_data = pd.read_csv(TestGenericFuture.co_contract_data_path).rename(
                 columns={"Quandl Code": "QuandlCode"})
             # Test Commodity, should be in co_tickers dictionary
-            commodity = "Brent"
+            commodity = "Copper"
             root_ticker = TestGenericFuture.co_tickers[commodity]
             mask = co_meta_data["code"].str.contains(root_ticker + "1$")
             quandl_codes = "CHRIS/" + co_meta_data[mask]["code"]
@@ -168,13 +168,14 @@ class TestGenericFuture(TestCase):
             far_future.set_expiries(far_future_expiries)
             basis = near_future.calculate_basis(far_future)
 
-            basis.to_excel("BasisOutput.xlsx")
-            basis.plot()
+            #basis.to_excel("BasisOutput.xlsx")
+
+            from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+            plot_acf(nb.values.squeeze(), lags=40)
+            #basis.plot()
             plt.show()
-
-
-
-
+            plot_pacf(near_future.series().values.squeeze(), lags=40)
+            plt.show()
 
         except Exception as e:
             self.fail()
