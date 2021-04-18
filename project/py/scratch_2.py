@@ -114,17 +114,9 @@ output.loc[~df["IsDeliveryMonth"], "Expiry"] = np.NaN
 
 output.to_excel("CornContract.xlsx")
 
-dates = pd.DataFrame(pd.bdate_range(start=df["Date"].min(), end=df["Date"].max() + dt.timedelta(days=720)),
-                  columns=["Date"])
-dates["Month"] = dates["Date"].transform(lambda x: x.strftime("%b"))
-dates["YearMon"] = dates["Date"].transform(lambda x: x.strftime("%y-%m"))
-dates["ContractMonth"] = dates["Month"].apply(lambda x: contract_months[x])
-mask = co_contract_data["QuandlCode"] == "CHRIS/" + root_ticker
-
-
-commodities = ["Corn", "Brent", "Lumber", "Copper"]
-all_data = pd.read_excel("output.xlsx")
+commodities = ["Corn", "Brent", "Lumber", "Copper", "Gold", "Platinum", "Wheat", "NaturalGas"]
+all_data = pd.read_excel("../data/RawData.xlsx")
 all_data = all_data.set_index("Date")
 tickers = [co_tickers[c] + "[1-3]$" for c in commodities]
 mask = all_data.columns.str.contains("|".join(tickers))
-all_data.iloc[:, ]
+all_data.iloc[:, mask].to_excel("../data/MultipleTestData.xlsx")

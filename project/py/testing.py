@@ -60,3 +60,8 @@ principalDf = pd.DataFrame(data=principalComponents,
                            columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
 pca.fit(X)
 
+fx_data = pd.read_excel("../data/FXData.xlsx")
+fx_data["period"] = pd.to_datetime(fx_data["period"])
+fx_data = fx_data.set_index("period")["2000-01-01":]
+fx_monthly_data = fx_data.resample('M', convention="end").last()
+fx_returns = fx_monthly_data.pct_change()

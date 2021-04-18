@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 import quandl
 import datetime as dt
+import statsmodels.api as sm
+import statsmodels.tools.sm_exceptions as sm_except
+from scipy import stats
 
 class GenericFuture(object):
 
@@ -22,6 +25,7 @@ class GenericFuture(object):
         self._cumulative_return = None
         self._expiry_dates = None
         self._basis = None
+        self._basis_period = None
         self._number = number
 
     def fill_data(self, data):
@@ -97,7 +101,7 @@ class GenericFuture(object):
     def expiry_dates(self):
         return self._expiry_dates
 
-    def calculate_basis(self, far_future):
+    def calculate_basis(self, far_future, log=False):
 
         to_expiry_ff = far_future.expiry_dates().iloc[:, 0] - far_future.series().reset_index().set_index("Date", drop=False)["Date"]
         to_expiry_nf = self.expiry_dates().iloc[:, 0] - self.series().reset_index().set_index("Date", drop=False)["Date"]
@@ -105,8 +109,42 @@ class GenericFuture(object):
         timedelta = to_expiry_ff.dt.days - to_expiry_nf.dt.days
         annual_factor = 365 / timedelta
         annual_factor = annual_factor.loc[:far_future.series().index.max()].copy()
-        self._basis = (self.series() / far_future.series() - 1) * annual_factor
+
+        if log:
+            self._basis = (self.series().transform(np.log) - far_future.series().transform(np.log)) * annual_factor
+        else:
+            self._basis = (self.series() / far_future.series() - 1) * annual_factor
+
+        self._basis.name = self._ticker.replace('[1-9]', '')
+
         return self._basis
+
+    def famafrench_test(self, far_future, r, log=True, frequency='M'):
+        try:
+            self.calculate_basis(far_future, log)
+            expiries = far_future.expiry_dates()
+            expiries["ExpMonth"] = expiries.iloc[:, 0].dt.month_name()
+
+            self._basis_period = self._basis.resample(frequency, convention='end').last()
+            self._basis_period.name = "Basis"
+            dummies = pd.get_dummies(expiries,
+                                     columns=["ExpMonth"],
+                                     prefix="",
+                                     prefix_sep="").drop(columns=expiries.columns[0],
+                                                         axis=1).resample(frequency, convention='end').last()
+            ff_data = dummies.join(self._basis_period,
+                                   how="right").join(r.resample(frequency,
+                                                                convention='end').last(),
+                                                     how="left").dropna()
+            y = ff_data["Basis"]
+            #y = y - y.shift(1)
+            X = ff_data.drop(columns="Basis")
+            #X["3 MO"] = X["3 MO"] - X["3 MO"].shift(1)
+            model = sm.OLS(y.dropna(), X.dropna())
+            y_hat = model.fit(cov_type='HAC', cov_kwds={'maxlags':12})
+            return y_hat
+        except sm_except.MissingDataError:
+            return None
 
     @staticmethod
     def generate_contract_expiries(ff_open_interest, root_ticker, co_contract_data, generic_contract_months,

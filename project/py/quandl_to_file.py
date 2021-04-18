@@ -21,7 +21,7 @@ co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
               "Aluminium": "CME_ALI", "Gas": "CME_NG", "Hogs": "CME_LN",
               "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
               "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
-              "Lumber": "CME_LB", "NaturalGas": "CME_NG", "Gold": "CME_GC",
+              "Lumber": "CME_LB", "NaturalGas": "CME_NG", "Gold": "CME_GC", "Silver": "SI",
               "Platinum": "CME_PL", "AUD": "CME_AD", "ZAR": "CME_RA", "NOK": "CME_NJ",
               "CAD": "CME_CD", "UST5": "CME_FV", "UST2": "CME_TU", "UST10": "CME_TY",
               "FedFunds": "CME_FF"}
@@ -30,11 +30,11 @@ contract_months = {"F": "Jan", "G": "Feb", "H":"March",
                    "J":"Apr", "K":"May", "M":"Jun", "N": "Jul", "Q": "Aug",
                    "U":"Sept",  "V":"Oct", "X":"Nov", "Z":"Dec"}
 
-co_meta_data_path = "../../data/CHRIS_metadata.csv"
-co_contract_data_path = "../../data/CHRIS_contractdata.csv"
+co_meta_data_path = "../data/CHRIS_metadata.csv"
+co_contract_data_path = "../data/CHRIS_contractdata.csv"
 
 co_meta_data = pd.read_csv(co_meta_data_path)
-co_contract_data = pd.read_csv(co_meta_data, header=True)
+co_contract_data = pd.read_csv(co_contract_data_path)
 
 mask = co_meta_data["code"].str.contains('|'.join(co_tickers.values()))
 quandl_codes = co_meta_data[mask]["code"]
@@ -55,7 +55,14 @@ for i in range(n):
             pass
 
         try:
-            open_interest_data[i] = data["Previous Day Open Interest"].rename(quandl_codes.iloc[i].replace("CHRIS/", ""))
+            if "Prev. Day Open Interest" in data.columns:
+                col = "Prev. Day Open Interest"
+            elif "Open Interest" in data.columns:
+                col = "Open Interest"
+            else:
+                col = "Previous Day Open Interest"
+
+            open_interest_data[i] = data[col].rename(quandl_codes.iloc[i].replace("CHRIS/", ""))
             #volume_data.append(volume)
         except Exception as e:
             print(e)
@@ -74,7 +81,7 @@ price_data = pd.concat(price_data, axis=1)
 volume_data = pd.concat(volume_data, axis=1)
 open_interest_data = pd.concat(open_interest_data, axis=1)
 
-with pd.ExcelWriter('output.xlsx') as writer:
+with pd.ExcelWriter('../data/RawData.xlsx') as writer:
     price_data.to_excel(writer, sheet_name="Settle")
     volume_data.to_excel(writer, sheet_name="Volume")
     open_interest_data.to_excel(writer, sheet_name="OpenInterest")
