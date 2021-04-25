@@ -13,12 +13,11 @@ class TestGenericFuture(TestCase):
     co_contract_data_path = "../data/CHRIS_contractdata.csv"
 
     co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
-                  "Corn": "CME_C", "Copper": "CME_HG",
-                  "Gas": "CME_NG", "Hogs": "CME_LN",
-                  "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
-                  "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
-                  "Lumber": "CME_LB", "NaturalGas": "CME_NG", "Gold": "CME_GC",
-                  "Platinum": "CME_PL", "Silver": "CME_SI"}
+              "Corn": "CME_C", "Copper": "CME_HG",
+              "Hogs": "CME_LN", "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
+              "Soy":"CME_S", "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
+              "Lumber": "CME_LB", "NatGas": "CME_NG", "Gold": "CME_GC",
+              "Platinum": "CME_PL", "Palladium": "CME_PA", "Silver": "CME_SI"}
 
     non_co_tickers = {
         "AUD": "CME_AD", "ZAR": "CME_RA", "NOK": "CME_NJ",
@@ -176,13 +175,12 @@ class TestGenericFuture(TestCase):
                     near_future.set_expiries(near_future_expiries)
                     far_future.set_expiries(far_future_expiries)
 
-                    basis = near_future.calculate_basis(far_future)
+                    basis = near_future.calculate_basis(far_future, log=True, ffill=True)
                     all_basis.append(basis)
                 except KeyError:
                     pass
 
-
-            pd.concat(all_basis, axis=1).to_excel("AllBasis.xlsx")
+            pd.concat(all_basis, axis=1).to_excel("AllBasisLog.xlsx")
             
                 #from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
                 #plot_acf(nb.values.squeeze(), lags=40)

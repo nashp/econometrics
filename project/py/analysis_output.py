@@ -6,11 +6,11 @@ import seaborn as sns;sns.set()
 from future import GenericFuture
 
 co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
-                  "Corn": "CME_C", "Copper": "CME_HG",
-                  "Hogs": "CME_LN", "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
-                  "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
-                  "Lumber": "CME_LB", "NatGas": "CME_NG", "Gold": "CME_GC",
-                  "Platinum": "CME_PL", "Silver": "CME_SI"}
+              "Corn": "CME_C", "Copper": "CME_HG",
+              "Hogs": "CME_LN", "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
+              "Soy":"CME_S", "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
+              "Lumber": "CME_LB", "NatGas": "CME_NG", "Gold": "CME_GC",
+              "Platinum": "CME_PL", "Palladium": "CME_PA", "Silver": "CME_SI"}
 
 
 def load_data(start_date="2000-01-01"):

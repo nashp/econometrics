@@ -45,7 +45,7 @@ class GenericFuture(object):
         if self._original_series is None:
             self._original_series = self._series
 
-        self._series = self._series.ffill(inplace=False)
+        self._series = self._series.ffill(inplace=False, limit=5)
         return self._series
 
     def series(self):
@@ -101,7 +101,7 @@ class GenericFuture(object):
     def expiry_dates(self):
         return self._expiry_dates
 
-    def calculate_basis(self, far_future, log=False):
+    def calculate_basis(self, far_future, log=False, ffill=True):
 
         to_expiry_ff = far_future.expiry_dates().iloc[:, 0] - far_future.series().reset_index().set_index("Date", drop=False)["Date"]
         to_expiry_nf = self.expiry_dates().iloc[:, 0] - self.series().reset_index().set_index("Date", drop=False)["Date"]
@@ -116,6 +116,8 @@ class GenericFuture(object):
             self._basis = (self.series() / far_future.series() - 1) * annual_factor
 
         self._basis.name = self._ticker.replace('[1-9]', '')
+        if ffill:
+            self._basis = self._basis.ffill(limit=5)
 
         return self._basis
 
