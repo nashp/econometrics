@@ -15,9 +15,9 @@ class TestGenericFuture(TestCase):
     co_tickers = {"Brent": "ICE_B", "WTI": "CME_CL", "Wheat": "CME_W",
               "Corn": "CME_C", "Copper": "CME_HG",
               "Hogs": "CME_LN", "Coffee": "ICE_KC", "Cotton": "ICE_CT", "Cocoa": "ICE_CC",
-              "Soy":"CME_S", "Sugar": "ICE_SB", "HeatOil": "CME_HO", "Gasoline": "CME_RB",
+              "Soy":"CME_S", "Sugar": "ICE_SB", #"HeatOil": "CME_HO", "Gasoline": "CME_RB", "Palladium": "CME_PA",
               "Lumber": "CME_LB", "NatGas": "CME_NG", "Gold": "CME_GC",
-              "Platinum": "CME_PL", "Palladium": "CME_PA", "Silver": "CME_SI"}
+              "Platinum": "CME_PL", "Silver": "CME_SI"}
 
     non_co_tickers = {
         "AUD": "CME_AD", "ZAR": "CME_RA", "NOK": "CME_NJ",
@@ -180,7 +180,19 @@ class TestGenericFuture(TestCase):
                 except KeyError:
                     pass
 
-            pd.concat(all_basis, axis=1).to_excel("AllBasisLog.xlsx")
+            all_basis = pd.concat(all_basis, axis=1)
+            all_basis.to_excel("../data/AllBasisLog.xlsx")
+            all_basis = all_basis.resample('M', convention='end').last()
+            summary_description = all_basis.describe().round(2).to_latex()
+            f = open('../writeup/tables/SummaryStatistics.tex', 'w')
+            f.write(summary_description)
+            f.close()
+            sns.set(rc={"grid.linewidth": 0.6, "figure.figsize": (11.7, 8.27)})
+            sns.set_style(style='whitegrid')
+            ax = sns.boxplot(data=all_basis)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+            ax.get_figure().savefig("../writeup/img/BasisBoxPlot.png")
+
             
                 #from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
                 #plot_acf(nb.values.squeeze(), lags=40)
@@ -197,7 +209,7 @@ class TestGenericFuture(TestCase):
         try:
             quandl.ApiConfig.api_key = 'Z2WYzGME3qmxnqQgBcdX'
             ust = quandl.get("USTREASURY/YIELD", start_date="2000-01-01")
-            f = open('FFRegressionTables.tex', 'a')
+            f = open('../writeup/tables/FFRegressionTables.tex', 'a')
             for co in TestGenericFuture.co_tickers.keys(): #["Corn", "Brent", "Lumber", "Copper", "Gold", "Wheat"]:
                 try:
                     commodity = co

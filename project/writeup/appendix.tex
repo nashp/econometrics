@@ -1,4 +1,40 @@
 \appendix
 \section{Appendix}
-\input{../tex/SummaryStatistics.tex}
-\input{../tex/FFRegressionTables.tex}
+%\input{../tex/SummaryStatistics.tex}
+\subsection{Commodity Identifiers}
+\begin{table}[h]
+\caption{Commodity Names and Shorthand Tickers}
+\label{tbl:conames}
+ \input{tables/CommodityTickers.tex}
+ \centering
+\end{table}
+\subsection{Country and Currency Identifiers}
+\begin{table}[h]
+\caption{Country \& ISO Currency Codes}
+\label{tbl:fxiso}
+ \input{tables/FXISOcodes.tex}
+ \centering
+\end{table}
+
+
+\subsection{Summary Statistics}
+\label{sec:summarystat}
+\begin{figure}[h]
+\caption{Box-Plot showing distribution of Basis}
+\label{img:boxplot}
+\centerline{\includegraphics[scale=0.7]{img/BasisBoxPlot}}
+\end{figure}
+
+\begin{table}[h]
+\caption{Summary Statistics}
+\label{tbl:summarystat}
+\centerline{\scalebox{0.6}{
+\input{tables/SummaryStatistics.tex}
+}}
+\end{table}
+
+\subsection{Fama-French Regression Results}
+\label{sec:ffresult}
+\input{tables/FFRegressionTables.tex}
+
+%\end{table}

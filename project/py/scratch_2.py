@@ -18,3 +18,7 @@ all_data = all_data.set_index("Date")
 tickers = [co_tickers[c] + "[1-3]$" for c in commodities]
 mask = all_data.columns.str.contains("|".join(tickers))
 all_data.iloc[:, mask].to_excel("../data/MultipleTestData.xlsx")
+
+
+df = pd.DataFrame.from_dict(co_tickers, orient='index', columns=['Ticker'])
+df.to_latex("../writeup/tables/CommodityTickers.tex")

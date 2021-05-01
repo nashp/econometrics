@@ -1,21 +1,50 @@
-\section{Theory}
+\section{Theory \& Background}
 \label{sec:theory}
-Theory of storage
+We first outline the Theory of Storage as developed by \cite{kaldor1939}, \cite{workin1949} and \cite{brennan1958} as it is applies to pricing commodities.
+\subsection{Convenience Yield and The Theory Of Storage}
+The Theory of Storage derives a relationship between contemporaneous prices of a given commodity, or spot price and future prices. Namely, the price of a given commodity that parties are willing to exchange that commodity for at a defined point in the future. If we consider an upward sloping curve\footnote{A lower spot price and higher futures price} we can say that holders of the physical commodity are compensated for a higher expected price in the future for cost of storage (including insurance \& warehousing costs) and interest forgone on capital. However, should the inverse situation arise, a term known as backwardation\footnote{Upward sloping is known as contango} this is more difficult to explain, why hold now when the future price is less? The Theory of Storage introduces a convenience yield whereby holders of the physical now accrue a benefit of being able to use that commodity e.g A baker needs wheat (flour) to make bread, the baker will pay to have access to this wheat or her bakery will not function. \Cref{eq:strg1} shows the difference between the spot price and future price can be determined by the storage cost $w_t$ of the commodity, the prevailing interest rate $r_t$ and a convenience yield $c_t$. The convenience yield can be thought of as the interest rate paid on a commodity in that commodity (\cite{convyieldoil}). It is the benefit accrued to the holder of the physical asset and does not extend to holders of the futures contract. The convenience yield is not directly observable but we can proxy this by using an interest rate adjusted basis which we discuss in \autoref{sec:data} 
+
 
 \begin{equation}
  \label{eq:strg1}
  F_{t,T} - S_t = S_t R_{t, T} + W_{t, T} - C_{t, T}
 \end{equation}
-or
+and isolating the convenience yield
 \begin{equation}
 \label{eq:strg2}
- \frac{F_{t,T} - S_t}{S_t} = R_{t, T} + \frac{W_{t, T} - C_{t, T}}{S_t}
+ C_{t, T} = S_t - F_t + S_t R_{t, T} + W_{t, T} 
 \end{equation}
+and rewriting 
+\begin{equation}
+ \frac{C_{t, T}}{S_t} = \frac{S_t - F_t}{S_t} + R_{t, T} + \frac{W_{t,T}}{S_t}
+\end{equation}
+The storage cost, $w_t$, is difficult to observe for non-insiders\footnote{non active participants in the trading on physical commodities} and so we treat storage costs as unobservable.
+\subsection{Theory of Backwardation}
+In addition to the Theory of Storage, the Theory of Backwardation, suggested by Keynes (1930) [TODO Reference] ,argues that backwardation is indeed the normal state of the market where futures prices are offered at a discount to spot in order for producers (hedgers) to transfer risk to investors (speculators) who demand a risk premium for providing such liquidity. The Theory of Backwardation suggests the basis consists of two components a risk premium $\pi_{t,T}$ and the expected change in the future spot price.
+\begin{equation}
+ F_{t, T} = S_{t, T} = (E[S_t] - S_t) - \pi_{t,T}
+\end{equation}
+The risk premium is therefore dependent on ``hedging pressure'', the balance of hedgers and speculators in the market. \cite{gorton2007} show the emergence of both a risk premium and convenience yield in relation to scarce inventories, but they do not find a relationship between this risk premium and hedging pressures. \cite{gorton2007} \& \cite{gorton2013} link the basis (convenience yield) to the state of inventories. That is a high convenience yield is linked with low inventories and scarcity of the physical asset, in fact this shown to be a non-linear relationship, with low inventories the convenience yield increases in an ever increasing mannor. Furthermore they show a relationship with the future risk premium of the commodity due to the volatility induced by such shortages and shocks. It is this relationship that we believe influences the risk premium in foreign exchange returns of commodity currencies. We aim to use this information to predict these returns.
+
+\subsection{Uncovered Interest Rate Parity}
+If we have a scarcity of the physical asset and low inventories \cite{gorton2007} shown that this will induce an increased risk premium due to increased price volatility. Investors will thus demand a higher risk premium for commodity currencies, which co-move with commodities and we expect a positive relationship between the basis (convenience yield) and currency return. 
+There is a wide array of literature on currency risk premiums but we use the framework laid out by \cite{currencyriskpremium} which represents the markets expected return of holding a foreign currency relative to the local currency. 
 
 \begin{equation}
  \label{eq:uip}
+ \pi_t = E[s_{t+k}] - s_t + r^{f}_t -r^{d}_t
 \end{equation}
 
-\subsection{Commodity Convenience Yield}
+where $s_t$ represents the log exchange rate in domestic currency
+units per foreign currency unit; $r^{f}_t$ and$r^{d}_t$ represent the foreign and local interest rates. $E[s_{t+k}]$ is the expected future spot price at time $t+k$. UIP suggests that that the risk premium, $\pi_t$ is constant 0 and under no arbitrage conditions. However, this has been widely rebuffed in the literature. We follow the thesis that this risk premium is non-zero and time-varying as laid out by \cite{currencyriskpremium} and others. We propose a relationship between this risk premium and that induced by low inventories.
 
+Using the model laid out by \cite{engel}, who argue that the exchange rate is a linear combination of macro-economic fundamentals, with many models implying a reduced form structure as follows 
+\begin{equation}
+ s_t = (1 - b) y_{1t} + by_{2t} + b E_t[s_{t+1}]
+\end{equation}
+where $0 < b < 1$ is a discount factor and the two variables $y_{1t}$ and $y_{2t}$ are some linear combinations of economic fundamentals. Solving forward we get
+\begin{equation}
+ s_t = (1-b) \sum_{j=0}^{\infty}b^jy_{1t} + \sum_{j=0}^{\infty}b^jy_{2t}
+\end{equation}
+\cite{engel} show that as the discount factor $b$ approaches one and the fundamentals contain a unit root then the process exhibits a random walk. \cite{engel} consider both stationary and non stationary fundamentals, they argue the long run relationship is governed by the non-stationary process and any deviation from this is governed by the non-stationary variable. We propose the convenience yield as the non-stationary macro-economic fundamental. 
 

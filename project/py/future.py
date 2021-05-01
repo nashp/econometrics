@@ -5,6 +5,8 @@ import datetime as dt
 import statsmodels.api as sm
 import statsmodels.tools.sm_exceptions as sm_except
 from scipy import stats
+import numpy as np
+
 
 class GenericFuture(object):
 
@@ -128,7 +130,7 @@ class GenericFuture(object):
             expiries["ExpMonth"] = expiries.iloc[:, 0].dt.month_name()
 
             self._basis_period = self._basis.resample(frequency, convention='end').last()
-            self._basis_period.name = "Basis"
+            self._basis_period.name = self._ticker + "_CY"
             dummies = pd.get_dummies(expiries,
                                      columns=["ExpMonth"],
                                      prefix="",
@@ -138,12 +140,12 @@ class GenericFuture(object):
                                    how="right").join(r.resample(frequency,
                                                                 convention='end').last(),
                                                      how="left").dropna()
-            y = ff_data["Basis"]
+            y = ff_data[self._basis_period.name]
             #y = y - y.shift(1)
-            X = ff_data.drop(columns="Basis")
+            X = ff_data.drop(columns=self._basis_period.name)
             #X["3 MO"] = X["3 MO"] - X["3 MO"].shift(1)
             model = sm.OLS(y.dropna(), X.dropna())
-            y_hat = model.fit(cov_type='HAC', cov_kwds={'maxlags':12})
+            y_hat = model.fit(cov_type='HAC', cov_kwds={'maxlags':int(np.power(X.shape[0], 1/3))})
             return y_hat
         except sm_except.MissingDataError:
             return None
